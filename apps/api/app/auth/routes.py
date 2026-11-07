@@ -16,6 +16,7 @@ from app.auth.deps import (
     client_ip,
     current_auth,
     now_utc,
+    origin_allowed,
     pending_auth,
 )
 from app.core import audit
@@ -70,8 +71,7 @@ class CodeIn(Strict):
 
 def origin_guard(request: Request) -> None:
     """Pre-session endpoints have no CSRF cookie yet; reject cross-site browser posts."""
-    origin = request.headers.get("origin")
-    if origin is not None and origin.rstrip("/") != get_settings().web_origin.rstrip("/"):
+    if not origin_allowed(request):
         raise ApiError(403, "csrf_failed", "This request came from an unexpected origin.")
 
 

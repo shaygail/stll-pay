@@ -234,7 +234,7 @@ function RequestQr({ req }: { req: Req }) {
       <p role="status" className="text-[14px]" data-testid="request-status">
         {req.status === "open" ? "Waiting for customer" : label}
       </p>
-      <a href={req.checkout_url} className="text-[13px] text-ink-2 underline" target="_blank" rel="noreferrer">
+      <a href={new URL(req.checkout_url).pathname} className="text-[13px] text-ink-2 underline" target="_blank" rel="noreferrer">
         Open the checkout link
       </a>
     </div>

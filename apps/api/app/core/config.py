@@ -39,6 +39,9 @@ class Settings(BaseSettings):
 
     # Browser-facing origin of the web app; used for CSRF origin checks and links.
     web_origin: str = "http://localhost:3000"
+    # Development only: also accept the origin the browser actually used, as reported by
+    # the web app's proxy (x-forwarded-host). For previews behind a forwarding URL.
+    dev_trust_forwarded_origin: bool = False
 
     # Sessions
     session_cookie_name: str = "stllpay_session"
@@ -98,6 +101,8 @@ class Settings(BaseSettings):
                 raise ValueError("APP_ENCRYPTION_KEY must be set in staging and production")
             if "devapp" in self.database_url or "devowner" in self.migration_database_url:
                 raise ValueError("Development database credentials are not allowed here")
+            if self.dev_trust_forwarded_origin:
+                raise ValueError("DEV_TRUST_FORWARDED_ORIGIN is for development only")
             if not self.web_origin.startswith("https://"):
                 raise ValueError("WEB_ORIGIN must be https in staging and production")
         if self.payments_provider == "akahu" and not (

@@ -88,7 +88,7 @@ test("merchant takes a payment from the dashboard and sees it paid", async ({ pa
   // The customer scans: open the checkout link on "their phone".
   const href = await page.getByRole("link", { name: "Open the checkout link" }).getAttribute("href");
   const phone = await context.newPage();
-  await phone.goto(new URL(href!).pathname);
+  await phone.goto(href!);
   await phone.getByRole("button", { name: "Pay $8.50 with my bank" }).click();
   await phone.getByRole("button", { name: "Approve payment" }).click();
   await expect(phone.getByText("Paid · confirmed by your bank")).toBeVisible({ timeout: 15_000 });

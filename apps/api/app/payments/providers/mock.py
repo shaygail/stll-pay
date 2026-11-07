@@ -33,6 +33,7 @@ import json
 import secrets
 from datetime import datetime, timedelta
 from typing import Any
+from urllib.parse import urlsplit
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
@@ -40,7 +41,6 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from sqlalchemy import text
 
 from app.core import clock
-from app.core.config import get_settings
 from app.core.db import get_sessionmaker
 from app.payments.providers.akahu_status import normalise_akahu
 from app.payments.providers.base import (
@@ -72,6 +72,12 @@ _FINAL: dict[int, tuple[str, str | None, int]] = {
     523: ("SENT", None, 180),
     524: ("FAILED", "REJECTED", 180),
 }
+
+
+def _path_only(url: str) -> str:
+    """The mock bank lives on the same site, so send the browser back with a relative URL."""
+    parts = urlsplit(url)
+    return parts.path + (f"?{parts.query}" if parts.query else "")
 
 
 class MockPaymentProvider:
@@ -107,7 +113,7 @@ class MockPaymentProvider:
             raise ProviderError(ErrorKind.TEMPORARY, "provider_timeout", "Mock provider timed out")
         return ProviderPayment(
             provider_payment_id=pid, status="READY", status_code=None,
-            authorisation_url=f"{get_settings().web_origin}/mock-bank/{pid}",
+            authorisation_url=f"/mock-bank/{pid}",  # relative: the mock bank is part of the web app
             expires_at=request.expires_at, amount_cents=request.amount_cents,
             payee_account=request.payee_account)
 
@@ -118,7 +124,7 @@ class MockPaymentProvider:
             raise ProviderError(ErrorKind.PERMANENT, "not_found", "Unknown mock payment")
         return ProviderPayment(
             provider_payment_id=row["id"], status=row["status"], status_code=row["status_code"],
-            authorisation_url=f"{get_settings().web_origin}/mock-bank/{row['id']}",
+            authorisation_url=f"/mock-bank/{row['id']}",
             expires_at=row["expires_at"], amount_cents=row["amount_cents"],
             payee_account=row["payee_account"])
 
@@ -177,14 +183,14 @@ class MockPaymentProvider:
             await self._set(provider_payment_id, status, code)
         if c == 508:
             await self._reorder_webhooks(provider_payment_id)
-        return str(row["redirect_uri"])
+        return _path_only(str(row["redirect_uri"]))
 
     async def customer_cancels(self, provider_payment_id: str) -> str:
         row = await self._row(provider_payment_id)
         if row is None or row["status"] != "READY":
             raise ProviderError(ErrorKind.PERMANENT, "not_ready", "This payment can't be cancelled")
         await self._set(provider_payment_id, "CANCELLED", "USER_CANCELLED")
-        return str(row["redirect_uri"])
+        return _path_only(str(row["redirect_uri"]))
 
     async def advance(self, provider_payment_id: str | None = None) -> None:
         """Apply anything due by now: delayed outcomes and expiry of unapproved payments."""

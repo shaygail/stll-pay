@@ -29,7 +29,8 @@ PASSWORD = "Correct-Horse-42-battery"  # noqa: S105 - test-only, disposable e2e 
 def main() -> None:
     settings = get_settings()
     name = make_url(settings.migration_database_url).database or ""
-    if settings.environment != "test" or not ("test" in name or "e2e" in name):
+    if settings.environment not in ("test", "development") or not any(
+            word in name for word in ("test", "e2e", "dev")):
         raise SystemExit(f"Refusing to seed {name!r} in {settings.environment!r}")
     suffix = secrets.token_hex(4)
     email = f"e2e-owner-{suffix}@example.com"

@@ -45,13 +45,28 @@ class AuthContext:
         return now_utc() - self.session.mfa_verified_at
 
 
+def origin_allowed(request: Request) -> bool:
+    """A browser request's Origin must be the web app's origin."""
+    settings = get_settings()
+    origin = request.headers.get("origin")
+    if origin is None:
+        return True  # not a cross-site browser request (CSRF needs the browser to send one)
+    origin = origin.rstrip("/")
+    if origin == settings.web_origin.rstrip("/"):
+        return True
+    if settings.dev_trust_forwarded_origin and not settings.is_deployed:
+        host = request.headers.get("x-forwarded-host")
+        proto = request.headers.get("x-forwarded-proto", "https").split(",")[0].strip()
+        return host is not None and origin == f"{proto}://{host.split(',')[0].strip()}"
+    return False
+
+
 def check_csrf(request: Request) -> None:
     """Double-submit token plus Origin check for cookie-authenticated unsafe requests."""
     if request.method in _SAFE_METHODS:
         return
     settings = get_settings()
-    origin = request.headers.get("origin")
-    if origin is not None and origin.rstrip("/") != settings.web_origin.rstrip("/"):
+    if not origin_allowed(request):
         raise ApiError(403, "csrf_failed", "This request came from an unexpected origin.")
     cookie = request.cookies.get(settings.csrf_cookie_name)
     header = request.headers.get(CSRF_HEADER)
