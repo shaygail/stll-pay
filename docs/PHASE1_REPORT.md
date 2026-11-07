@@ -1,6 +1,6 @@
 # STLL PAY: Phase 1 research and audit
 
-**Date:** 2026-11-07 · **Status:** awaiting your approval · **No application code written.**
+**Date:** 2026-11-07 · **Status:** approved 2026-11-07 (hosting: Supabase Postgres in Sydney) · **No application code written.**
 
 Contents:
 1. Audit of the existing projects
@@ -119,13 +119,13 @@ A shared `@stll/ui` package can come later if a third app needs them.
  Merchant/admin ─┤ /dashboard · /admin   (BFF: httpOnly session cookie only)      │
                  └───────────────┬─────────────────────────────────────────────────┘
                                  │ HTTPS (server to server)
-        ┌────────────────────────▼──── api.pay.stllhaus.co (FastAPI, Sydney region) ─┐
+        ┌────────────────────────▼──── api.pay.stllhaus.co (FastAPI, Sydney host) ───┐
 STLL POS┤ /v1 integration API (API keys)    │  domains: merchants · auth · payments  │
  ──────►│ /webhooks/akahu (RSA verify)      │  providers: Mock | Akahu               │
         │ worker: poll · expire · webhook-out · reconcile (same codebase, own process)│
         └───────────┬───────────────────────────────────────┬─────────────────────┘
                     │                                       │ Basic auth, server side only
-             PostgreSQL 16 (managed, Sydney)        api.payments.akahu.io
+        Supabase Postgres (own project, Sydney)     api.payments.akahu.io
 ```
 
 **Key choices:**
@@ -167,6 +167,22 @@ STLL POS┤ /v1 integration API (API keys)    │  domains: merchants · auth ·
   - `staging`: Akahu sandbox and Demo Bank.
   - `prod`: Akahu production, live payments flag **off** by default.
   Each environment has its own database and secrets.
+
+### 5a. Hosting decision (approved)
+
+- **Database:** a **dedicated Supabase project** for STLL PAY in `ap-southeast-2` (Sydney),
+  separate from STLL REWARDS. It is used **as plain Postgres only**:
+  - The Data API (PostgREST) is **disabled**, so there are no anon or public keys for STLL PAY.
+  - Supabase Auth and Storage are not used.
+  - SSL is enforced, and network restrictions allow only the API and worker hosts.
+  - Point-in-time recovery is on before any live payments.
+  - MFA is on for every Supabase dashboard account.
+  - The app connects as a non-owner role. Migrations use a separate owner role.
+- **API and worker:** a host with a Sydney region (Fly.io `syd` or AWS `ap-southeast-2`;
+  final choice in Phase 3), so database round trips stay local.
+- **Web:** Vercel with `preferredRegion = "syd1"`, as STLL REWARDS uses.
+- Check the current SOC 2 status and prices on the vendors' trust and pricing pages
+  before the Akahu application.
 
 ### Checkout flow (dynamic QR)
 
@@ -310,8 +326,8 @@ and reference.
 | Item | Estimate |
 |---|---|
 | Vercel (Pro, if needed) | ~US$20 / month |
-| Railway API plus worker | ~US$10–30 / month |
-| Managed Postgres in Sydney with backups | ~US$15–30 / month |
+| API plus worker on a Sydney host (for example Fly.io `syd`) | ~US$10–30 / month |
+| Supabase Pro project (Sydney) plus point-in-time recovery add-on | ~US$25 / month plus the add-on |
 | Sentry | free tier or ~US$26 / month |
 | Email (Resend, already used) | free tier |
 | **Akahu** | usage-based per payment plus possible fixed fees. **Not known: ask Akahu (Q5)** |
@@ -331,7 +347,7 @@ and reference.
    new Full App for STLL PAY. Also, should I draft the email to Akahu with the questions
    in [AKAHU_INTEGRATION.md §6](AKAHU_INTEGRATION.md#6-questions-that-must-go-to-akahu)?
 4. **POS default success policy:** complete the order on `SENT` (recommended).
-5. **Hosting:** Vercel plus Railway (matches today's setup), or something else?
+5. ~~Hosting~~ **Decided:** Supabase Postgres in Sydney (see §5a). Backend on a Sydney host. Vercel `syd1` for the web app.
 6. **POS secret:** will you rotate the committed POS credentials, or would you like me to
    prepare the POS repo change that removes the file? That needs your approval, since it
    touches the POS.
