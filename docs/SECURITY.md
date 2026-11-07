@@ -22,6 +22,8 @@ review is planned for Phase 8.
 | Headers | API: `nosniff`, `DENY` framing, CSP `default-src 'none'`, `no-store`, HSTS when deployed. Web: CSP, `DENY` framing, `nosniff`, HSTS in production | `app/main.py`, `next.config.ts` |
 | Secrets | Server-side only. Staging and production refuse development keys and credentials. Akahu credentials are never sent to the browser. `.env` files are git-ignored. CI runs a secret scan | `app/core/config.py` |
 | Live payments | Off by default. Need `ENVIRONMENT=production`, `PAYMENTS_PROVIDER=akahu`, Akahu credentials, `LIVE_PAYMENTS_ENABLED=true`, **and** a per-merchant switch only a platform admin can flip on an active merchant | |
+| Payments | Amounts are integer cents, validated on the server with strict types. Destinations come only from a verified, encrypted bank-account snapshot; the client can't supply one. Snapshots and amounts are immutable in the database. Webhooks are RSA-verified, deduplicated and re-confirmed with the provider. Indeterminate results are never retried automatically | `app/payments` |
+| POS API | API keys are stored as hashes, shown once, and revocable. The integration on/off switch blocks keys immediately. Idempotency keys are required. Per-key rate limit. Outbound webhooks are HMAC-SHA256 signed with a timestamp. Webhook URLs must be https and public when deployed | `routes_pos.py`, `worker.py` |
 | Shared devices | Logout does a full page reload, so no data from the session stays in browser memory (relevant for POS tablets) | `apps/web/lib/useMe.ts` |
 | Dependencies | `pip-audit` and `npm audit --audit-level=high` in CI | `.github/workflows/ci.yml` |
 
@@ -34,7 +36,9 @@ review is planned for Phase 8.
 5. **No password reset or MFA recovery codes yet** (Phase 6). Recovery must be multi-factor, per Akahu's rules.
 6. **Passkeys** are planned after the MVP.
 7. **Platform admins** are created by the schema owner with SQL. This is manual and intentional, and should be done with two people.
-8. 8 moderate `npm audit` findings are in dev-only lint tooling (`minimatch` under ESLint). There are no high or critical findings.
+8. **Webhook URL checks** don't yet resolve DNS, so a public name pointing at a private IP (DNS rebinding) isn't blocked. Phase 8 adds an egress allowlist or resolve-then-connect checks.
+9. **Row-level security context is set by the API itself.** It protects against query bugs, not against a compromised API process. That's why secrets, the database owner role and admin creation are kept separate.
+10. 8 moderate `npm audit` findings are in dev-only lint tooling (`minimatch` under ESLint). There are no high or critical findings.
 
 ## Reporting a vulnerability
 

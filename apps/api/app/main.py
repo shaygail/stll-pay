@@ -19,6 +19,11 @@ from app.core.db import dispose_engine, get_sessionmaker
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
 from app.merchants.routes import router as merchants_router
+from app.payments.routes_checkout import mock_bank as mock_bank_router
+from app.payments.routes_checkout import router as checkout_router
+from app.payments.routes_merchant import router as payments_router
+from app.payments.routes_pos import router as pos_router
+from app.payments.routes_webhooks import router as webhooks_router
 
 log = structlog.get_logger()
 
@@ -101,6 +106,12 @@ def create_app() -> FastAPI:
     app.include_router(me_router)
     app.include_router(merchants_router)
     app.include_router(admin_router)
+    app.include_router(payments_router)
+    app.include_router(pos_router)
+    app.include_router(checkout_router)
+    app.include_router(webhooks_router)
+    if settings.payments_provider == "mock" and settings.environment != "production":
+        app.include_router(mock_bank_router)
     return app
 
 

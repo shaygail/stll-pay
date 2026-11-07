@@ -55,6 +55,7 @@ def _alembic_config() -> Config:
 def owner_engine() -> Iterator[Engine]:
     engine = create_engine(get_settings().migration_database_url)
     with engine.begin() as conn:
+        conn.execute(text("DROP SCHEMA IF EXISTS mock_provider CASCADE"))
         conn.execute(text("DROP SCHEMA public CASCADE"))
         conn.execute(text("CREATE SCHEMA public"))
         conn.execute(text(f"GRANT USAGE ON SCHEMA public TO {get_settings().app_db_role}"))
@@ -193,3 +194,7 @@ def make_admin(owner_engine: Engine, user: TestUser) -> None:
     with owner_engine.begin() as conn:
         conn.execute(text("UPDATE users SET is_platform_admin = true WHERE id = :id"),
                      {"id": user.id})
+
+
+# Payment fixtures (defined in tests/pay.py, registered here).
+from tests.pay import _reset_clock, mock, shop  # noqa: E402, F401

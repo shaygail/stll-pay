@@ -57,7 +57,13 @@ class Settings(BaseSettings):
     email_backend: Literal["console", "file"] = "console"
     email_outbox_dir: str = ".outbox"
 
-    # Payments (used from Phase 4). Mock by default; Akahu needs explicit configuration.
+    # Public base URL of this API, used for provider webhooks. Behind the web app's
+    # rewrite this is for example https://pay.stllhaus.co/api
+    public_api_url: str = "http://localhost:8000"
+    # Largest single payment, in cents (banks apply their own limits too).
+    max_payment_cents: int = 1_000_000
+
+    # Payments. Mock by default; Akahu needs explicit configuration.
     payments_provider: Literal["mock", "akahu"] = "mock"
     live_payments_enabled: bool = False
     akahu_app_token: SecretStr | None = None
@@ -98,6 +104,8 @@ class Settings(BaseSettings):
             self.akahu_app_token and self.akahu_app_secret
         ):
             raise ValueError("PAYMENTS_PROVIDER=akahu needs AKAHU_APP_TOKEN and AKAHU_APP_SECRET")
+        if self.environment == "production" and self.payments_provider == "mock":
+            raise ValueError("The mock payment provider is not allowed in production")
         if self.live_payments_enabled and self.environment != "production":
             raise ValueError("LIVE_PAYMENTS_ENABLED is only allowed in production")
         if self.live_payments_enabled and self.payments_provider != "akahu":

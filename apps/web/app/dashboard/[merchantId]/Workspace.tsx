@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { PaymentsPanel } from "@/components/PaymentsPanel";
 import { StepUp } from "@/components/StepUp";
 import { TestModeBanner } from "@/components/TestModeBanner";
 import { Button, Notice, StatusChip, Wordmark } from "@/components/ui";
@@ -146,12 +147,19 @@ export function MerchantWorkspace() {
               )}
             </section>
 
-            <section className="flex flex-col gap-3 rounded-md border border-line p-5">
-              <h2 className="text-[17px]">Payments</h2>
-              <p className="text-[15px] text-ink-2">
-                QR codes, payment requests and payment links aren&apos;t available yet.
-              </p>
-            </section>
+            {merchant.status === "restricted" || merchant.status === "active" ? (
+              <PaymentsPanel
+                merchantId={merchant.id}
+                canCreate={merchant.role === "owner" || merchant.role === "manager" || merchant.role === "cashier"}
+                canManageBank={isOwner}
+                onStepUp={(retry) => setPending(() => retry)}
+              />
+            ) : (
+              <section className="flex flex-col gap-3 rounded-md border border-line p-5">
+                <h2 className="text-[17px]">Payments</h2>
+                <p className="text-[15px] text-ink-2">Payments open once STLL PAY has approved your business.</p>
+              </section>
+            )}
 
             {members && (
               <section aria-labelledby="team" className="flex flex-col gap-4">

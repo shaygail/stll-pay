@@ -9,7 +9,7 @@ const WEB_PORT = 3100;
 const API_PORT = 8001;
 export const OUTBOX = path.resolve(__dirname, "e2e/.outbox");
 
-const apiEnv = {
+export const apiEnv = {
   ENVIRONMENT: "test",
   DATABASE_URL:
     process.env.E2E_DATABASE_URL ?? "postgresql+asyncpg://stllpay_app:devapp@localhost:5432/stllpay_e2e",

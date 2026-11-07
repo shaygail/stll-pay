@@ -103,3 +103,99 @@ async def change_live(merchant_id: uuid.UUID, body: LiveChange, request: Request
 async def verify_audit_chain(db: Db, _: AuthContext = Depends(platform_admin)) -> dict[str, Any]:
     broken = (await db.execute(text("SELECT audit_verify_chain()"))).scalar()
     return {"intact": broken is None, "first_broken_id": broken}
+
+
+# ---------------------------------------------------------------- payments administration
+
+
+class Decision(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    reason: str = Field(min_length=3, max_length=500)
+
+
+class Resolution(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    outcome: Literal["sent", "failed"]
+    evidence: str = Field(min_length=10, max_length=1000)
+
+
+@router.post("/bank-accounts/{account_id}/verify")
+async def verify_bank_account(account_id: uuid.UUID, body: Decision, request: Request, db: Db,
+                              auth: AuthContext = Depends(platform_admin)) -> dict[str, Any]:
+    """Phase 6 adds the full ownership check. Until then, an admin confirms ownership
+    out of band (for example a bank statement) and records how in the reason."""
+    from app.payments.models import BankAccount
+    from app.payments.routes_merchant import account_out
+
+    acct = (await db.execute(select(BankAccount).where(BankAccount.id == account_id)
+                             .with_for_update())).scalar_one_or_none()
+    if acct is None:
+        raise not_found("Bank account not found")
+    if acct.status != "pending":
+        raise ApiError(409, "invalid_status", f"This account is {acct.status}.")
+    previous = (await db.execute(select(BankAccount).where(
+        BankAccount.merchant_id == acct.merchant_id, BankAccount.status == "verified")
+        .with_for_update())).scalars().all()
+    from app.core import clock
+
+    for p in previous:
+        p.status = "retired"
+        p.retired_at = clock.now()
+    await db.flush()
+    acct.status = "verified"
+    acct.verified_by = auth.user.id
+    acct.verified_at = clock.now()
+    await db.flush()
+    await audit.record(db, "admin.bank_account_verified", actor_user_id=auth.user.id,
+                       merchant_id=acct.merchant_id, target_type="bank_account",
+                       target_id=str(acct.id), ip=client_ip(request),
+                       metadata={"reason": body.reason, "retired": [str(p.id) for p in previous]})
+    return account_out(acct)
+
+
+@router.get("/payments/review")
+async def review_queue(db: Db, _: AuthContext = Depends(platform_admin)) -> dict[str, Any]:
+    from app.payments.models import PaymentAttempt, PaymentRequest
+    from app.payments.service import request_public
+
+    rows = (await db.execute(select(PaymentRequest).where(
+        PaymentRequest.status == "requires_review").order_by(PaymentRequest.updated_at.desc())
+        .limit(200))).scalars().all()
+    items = []
+    for r in rows:
+        attempts = (await db.execute(select(PaymentAttempt).where(
+            PaymentAttempt.payment_request_id == r.id).order_by(PaymentAttempt.created_at))
+        ).scalars().all()
+        items.append({**request_public(r), "merchant_id": str(r.merchant_id),
+                      "attempts": [{"id": str(a.id), "status": a.status,
+                                    "reason": a.status_reason,
+                                    "provider_status": a.provider_status,
+                                    "provider_status_code": a.provider_status_code}
+                                   for a in attempts]})
+    return {"items": items}
+
+
+@router.post("/payment-attempts/{attempt_id}/resolve")
+async def resolve_attempt(attempt_id: uuid.UUID, body: Resolution, request: Request, db: Db,
+                          auth: AuthContext = Depends(platform_admin)) -> dict[str, Any]:
+    """Settle a payment the provider couldn't confirm, using evidence such as the merchant's
+    bank statement. Only for attempts in REQUIRES_REVIEW; every resolution is audited."""
+    from app.payments import service
+    from app.payments.models import PaymentAttempt
+    from app.payments.states import Status
+
+    a = (await db.execute(select(PaymentAttempt).where(PaymentAttempt.id == attempt_id)
+                          .with_for_update())).scalar_one_or_none()
+    if a is None:
+        raise not_found("Payment attempt not found")
+    if a.status != Status.REQUIRES_REVIEW:
+        raise ApiError(409, "not_in_review", "Only payments needing review can be resolved.")
+    target = Status.SENT if body.outcome == "sent" else Status.FAILED
+    await service._transition(db, a, target, method="admin_resolution",
+                              reason="admin_resolution", operator_id=auth.user.id,
+                              note=body.evidence)
+    await audit.record(db, "admin.payment_resolved", actor_user_id=auth.user.id,
+                       merchant_id=a.merchant_id, target_type="payment_attempt",
+                       target_id=str(a.id), ip=client_ip(request),
+                       metadata={"outcome": body.outcome, "evidence": body.evidence})
+    return {"id": str(a.id), "status": a.status}

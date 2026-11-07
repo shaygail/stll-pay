@@ -25,9 +25,27 @@ On Supabase, create both roles yourself. Don't run the app as `postgres` or `ser
 | `audit_logs` | Append-only, hash-chained (`prev_hash`, `hash`). `audit_verify_chain()` returns the first broken row |
 | `audit_chain_head` | One row holding the last hash. The app role can't read it |
 
-Payment tables (`payment_requests`, `payment_attempts`, provider events, QR codes, links,
-POS integrations, API keys, webhooks) arrive in Phase 4 migrations, as designed in
-[PHASE1_REPORT.md §6](PHASE1_REPORT.md#6-database).
+### Migration `0002_payments`
+
+| Table | Notes |
+|---|---|
+| `merchant_bank_accounts` | Encrypted account number plus last 4 digits. Details are immutable after creation (trigger). Only a platform admin can verify. One verified account per merchant; verifying a new one retires the old |
+| `pos_integrations` | Per-merchant integration with an `enabled` feature flag |
+| `api_keys` | Prefix plus SHA-256 hash only. Revocable, optional expiry |
+| `webhook_endpoints` | Merchant webhook URL with an encrypted signing secret |
+| `static_qr_codes`, `payment_links` | Counter QR codes; fixed or open-amount links with expiry and use limits |
+| `payment_requests` | Integer cents, NZD only, unique `SP` reference, random checkout token. Unique per idempotency key, and at most one live request per POS order. Amount, merchant and reference are immutable |
+| `payment_attempts` | Immutable destination snapshot and amount. At most one in flight and one successful per request (partial unique indexes). Final statuses can't change |
+| `payment_provider_events` | Every verified webhook, deduplicated on a unique hash key |
+| `payment_reconciliations` | Every status change, with method (webhook, poll, admin and so on) |
+| `payment_events` | At most one outcome event per request and type |
+| `webhook_deliveries` | Outbox for POS webhooks with retry state |
+| `mock_provider.*` | The mock provider's own state (development and tests; unused in production) |
+
+All merchant-owned payment tables have row-level security. Public checkout endpoints use
+narrow `SECURITY DEFINER` lookups (`lookup_merchant_by_slug`, `lookup_request_by_token`,
+and so on). Each returns only a merchant id, and the caller then works inside that merchant's
+context.
 
 ## Row-level security
 

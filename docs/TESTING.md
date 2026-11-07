@@ -74,9 +74,57 @@ doesn't contain `test` or `e2e`.
 
 **Settings:** production refuses development keys and credentials, plain-HTTP origins, Akahu without credentials, and live payments without Akahu. Live payments are refused outside production.
 
-## Payment test scenarios
+## Payment scenarios (Phase 4, mock provider)
 
-The scenario list from the brief (success, cancel, timeout, delayed results, duplicates,
-replayed, missing and out-of-order webhooks, expiry, tampered amounts, cross-merchant
-access, restarts, reconciliation) is built in Phase 4 with the mock provider. Akahu Demo
-Bank scenarios, using its documented magic amounts, come in Phase 5.
+The mock provider behaves like an external provider. It has its own tables, changes state on
+its own schedule, and sends RSA-signed webhooks in Akahu's format. It uses Akahu Demo Bank's
+documented magic amounts, plus a few mock-only ones:
+
+| Amount | Outcome |
+|---|---|
+| 5.01 | Create fails with a server error |
+| 5.02 / 5.03 | `FAILED` / internal or bank error |
+| 5.04 | `FAILED` / `BANK_ERROR_INDETERMINATE`, so review |
+| 5.15 | Declined |
+| 5.20 / 5.22 | Sent / declined after 30 s |
+| 5.23 / 5.24 | Sent / declined after 180 s |
+| 5.05 | Mock only: create times out |
+| 5.06 | Mock only: no webhooks (polling must recover) |
+| 5.07 | Mock only: every webhook sent twice |
+| 5.08 | Mock only: webhooks out of order |
+
+A leading `105.` acts like `5.`, as in Demo Bank. Tests move a controllable clock
+(`app/core/clock.py`) rather than waiting.
+
+| Brief scenario | Test |
+|---|---|
+| Successful payment | `test_payments_flow.py::test_counter_qr_success`, `test_pos_dynamic_qr_success_notifies_pos_once`, e2e |
+| Customer cancellation | `test_customer_cancels_at_bank_then_pays`, e2e |
+| Payment failure | `test_payment_failure_allows_retry` (4 cases), e2e |
+| Bank timeout | `test_bank_timeout_on_create` |
+| Delayed success / failure | `test_delayed_success`, `test_delayed_failure`, e2e (processing never shown as paid) |
+| Duplicate payment request | `test_pos_idempotency_and_duplicate_orders`, `test_concurrent_pay_taps_create_one_attempt` |
+| Replayed webhook | `test_replayed_webhooks_are_ignored` |
+| Missing webhook | `test_missing_webhooks_recovered_by_polling` |
+| Out-of-order webhook | `test_out_of_order_webhooks_never_go_backwards` |
+| Customer closes browser | `test_customer_closes_browser_after_approving` |
+| Expired QR / link | `test_expired_pos_qr`, `test_expiry_never_cancels_an_approved_payment`, `test_expired_payment_link` |
+| Manipulated amount | `test_manipulated_amounts_rejected` (6 cases), `test_client_cannot_supply_destination_or_amount_at_pay` |
+| Invalid bank destination | `test_merchant_without_verified_account_cannot_take_payments`, `test_bank_account_change_never_affects_existing_payment`, `test_only_admin_can_verify_bank_accounts` |
+| Cross-merchant access | `test_cross_merchant_access`, `test_rls_hides_other_merchants_payments` |
+| Duplicate order completion | `test_pos_dynamic_qr_success_notifies_pos_once`, `test_replayed_webhooks_are_ignored` |
+| Provider downtime | `test_provider_create_error_is_clean_failure`, `test_provider_downtime_during_polling_changes_nothing` |
+| Server restart during processing | `test_server_restart_during_processing`, `test_crash_before_provider_answers_is_recovered` |
+| Reconciliation failure | `test_indeterminate_bank_error_goes_to_review_and_is_never_retried`, `test_no_final_status_after_a_day_needs_review` |
+
+Also covered:
+- Forged webhooks.
+- POS webhook retries and signatures.
+- Cancelling while the customer is at the bank, and refusing to cancel after approval.
+- API key revocation and the integration on/off switch.
+- Step-up for bank and integration changes.
+- Cashier limits.
+- Immutable amounts and destinations in the database.
+- The Akahu status mapping, and the state machine rules.
+
+Akahu Demo Bank runs of the same scenarios come in Phase 5.

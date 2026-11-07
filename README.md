@@ -2,7 +2,7 @@
 
 QR-based open banking payments for New Zealand businesses, from STLL HAUS.
 
-> **Status: Phase 3 (application foundation) done, awaiting approval.**
+> **Status: Phase 4 (payment engine, mock provider) done, awaiting approval.**
 > Real-money payments are **not** enabled. They stay disabled until Akahu approval, a
 > security review and the full test milestones are complete.
 
@@ -44,6 +44,10 @@ cd apps/api && uv run uvicorn app.main:app --reload --port 8000
 ```
 
 ```bash
+cd apps/api && uv run python -m app.worker
+```
+
+```bash
 cd apps/web && cp .env.example .env.local && npm ci && npm run dev
 ```
 
@@ -79,13 +83,15 @@ cd apps/web && npm test && npm run e2e -- --trace off
 | [DATABASE.md](docs/DATABASE.md) | Schema, roles, row-level security, migrations |
 | [SECURITY.md](docs/SECURITY.md) | Controls in place and known gaps |
 | [TESTING.md](docs/TESTING.md) | How to run each suite and what it proves |
+| [PAYMENT_LIFECYCLE.md](docs/PAYMENT_LIFECYCLE.md) | Requests, attempts, statuses, failure handling, worker |
+| [POS_INTEGRATION.md](docs/POS_INTEGRATION.md) | POS API, idempotency, signed webhooks, success policy |
 
 ## Delivery phases
 
 1. Research and audit ✓
 2. UX/UI design ✓
-3. Application foundation ← **current**
-4. Payment engine (mock provider)
+3. Application foundation ✓
+4. Payment engine (mock provider) ← **current**
 5. Akahu integration (Demo Bank only)
 6. Merchant platform
 7. STLL POS integration

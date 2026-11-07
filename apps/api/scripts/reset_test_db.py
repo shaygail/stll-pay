@@ -27,6 +27,7 @@ def main() -> None:
         raise SystemExit(f"Refusing to reset database {name!r} in {settings.environment!r}")
     engine = create_engine(settings.migration_database_url)
     with engine.begin() as conn:
+        conn.execute(text("DROP SCHEMA IF EXISTS mock_provider CASCADE"))
         conn.execute(text("DROP SCHEMA public CASCADE"))
         conn.execute(text("CREATE SCHEMA public"))
         conn.execute(text(f"GRANT USAGE ON SCHEMA public TO {settings.app_db_role}"))

@@ -26,7 +26,8 @@ def test_defaults_are_safe():
 
 
 def test_production_config_valid():
-    s = Settings(_env_file=None, **PROD)
+    s = Settings(_env_file=None, payments_provider="akahu", akahu_app_token="t",
+                 akahu_app_secret="s", **PROD)
     assert s.secure_cookies is True
     assert s.live_payments_enabled is False
 
@@ -35,12 +36,16 @@ def test_production_config_valid():
     {"app_encryption_key": "ZGV2LW9ubHktZGV2LW9ubHktZGV2LW9ubHktZGV2LTA="},
     {"database_url": "postgresql+asyncpg://stllpay_app:devapp@localhost/x"},
     {"web_origin": "http://pay.stllhaus.co"},
-    {"payments_provider": "akahu"},
+    {"payments_provider": "akahu", "akahu_app_token": None},
+    {"payments_provider": "mock"},
     {"live_payments_enabled": True},
 ])
 def test_unsafe_production_config_rejected(override):
+    base = {**PROD, "payments_provider": "akahu", "akahu_app_token": "t", "akahu_app_secret": "s"}
+    if override.get("live_payments_enabled"):
+        base["payments_provider"] = "mock"
     with pytest.raises(ValidationError):
-        Settings(_env_file=None, **{**PROD, **override})
+        Settings(_env_file=None, **{**base, **override})
 
 
 def test_live_payments_never_outside_production():
@@ -100,4 +105,5 @@ def test_empty_env_values_mean_unset():
     assert s.akahu_app_token is None and s.akahu_app_secret is None
     assert s.app_encryption_key.get_secret_value()
     with pytest.raises(ValidationError):
-        Settings(_env_file=None, **{**PROD, "app_encryption_key": ""})
+        Settings(_env_file=None, payments_provider="akahu", akahu_app_token="t",
+                 akahu_app_secret="s", **{**PROD, "app_encryption_key": ""})
