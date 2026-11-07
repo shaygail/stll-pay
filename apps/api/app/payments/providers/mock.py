@@ -31,11 +31,10 @@ from __future__ import annotations
 import base64
 import json
 import secrets
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any
 from urllib.parse import urlsplit
 
-from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from sqlalchemy import text
@@ -43,6 +42,12 @@ from sqlalchemy import text
 from app.core import clock
 from app.core.db import get_sessionmaker
 from app.payments.providers.akahu_status import normalise_akahu
+from app.payments.providers.akahu_wire import (
+    KEY_HEADER,
+    SIGNATURE_HEADER,
+    parse_notice,
+    verify_signature,
+)
 from app.payments.providers.base import (
     CreatePayment,
     ErrorKind,
@@ -52,9 +57,6 @@ from app.payments.providers.base import (
     WebhookRejected,
 )
 from app.payments.states import Status
-
-SIGNATURE_HEADER = "x-akahu-payments-signature"
-KEY_HEADER = "x-akahu-payments-signing-key"
 
 
 def scenario_cents(amount_cents: int) -> int:
@@ -147,19 +149,8 @@ class MockPaymentProvider:
         public_key = await self._public_key(key_id)
         if public_key is None:
             raise WebhookRejected("unknown signing key")
-        try:
-            public_key.verify(base64.b64decode(signature), raw_body, padding.PKCS1v15(),
-                              hashes.SHA256())
-        except (InvalidSignature, ValueError) as exc:
-            raise WebhookRejected("bad signature") from exc
-        try:
-            body = json.loads(raw_body)
-            assert body["type"] == "ONE_OFF_PAYMENT_STATUS_UPDATE"
-            reason = body.get("status_reason") or {}
-            emitted = datetime.fromisoformat(body["emitted_at"].replace("Z", "+00:00"))
-            return WebhookNotice(body["_payment"], body.get("status"), reason.get("code"), emitted)
-        except (ValueError, KeyError, AssertionError, TypeError) as exc:
-            raise WebhookRejected("malformed body") from exc
+        verify_signature(public_key, raw_body, signature)
+        return parse_notice(raw_body)
 
     # ------------------------------------------------------------ the mock bank's own actions
 

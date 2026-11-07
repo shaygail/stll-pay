@@ -32,8 +32,9 @@ class CreatePayment:
     reference: str  # appears on the merchant's statement; at most 12 characters
     payer_reference: str  # appears on the customer's statement; at most 12 characters
     redirect_uri: str
-    webhook_uri: str
+    webhook_uri: str | None
     expires_at: datetime
+    payer_bank: str | None = None  # Akahu: force one bank, e.g. "demo_bank" for tests
 
 
 @dataclass(frozen=True)

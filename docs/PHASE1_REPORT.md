@@ -278,6 +278,19 @@ Each phase ends with a stop for your approval.
 
 Phases 2 to 4 and most of 6 can run **now**, without waiting on Akahu.
 
+### 8a. Approved change (2026-11-07): single-merchant MVP launch
+
+After Phase 5, the first release is **STLL HAUS only**:
+
+- **One merchant (STLL HAUS)**, one administrator account, and one verified **ANZ business** receiving account.
+- **Public merchant sign-up and onboarding switched off.** The multi-merchant database, tenant isolation and roles stay in place.
+- **Priorities:** static QR, dynamic QR (POS), payment links, Akahu, automatic payment status, and the merchant dashboard.
+- **A simple interface:** no business switcher, no "add a business" screen, no multi-merchant admin views where one merchant is enough.
+- **Payments proven on the mock provider and Akahu Demo Bank first.** Real payments stay off until permissions, approvals and security checks are complete.
+- **More merchants later** through an administrator-controlled feature flag, with no rebuild. The data model already supports it.
+
+This reshapes Phase 6 (merchant platform): onboarding is built behind the flag, and only the STLL HAUS path is switched on.
+
 ## 9. Testable without real money
 
 **Fully testable now with the mock provider:**

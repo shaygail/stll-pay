@@ -41,7 +41,8 @@ from app.payments.providers.registry import get_provider
 router = APIRouter(prefix="/v1/merchants/{merchant_id}", tags=["payments"])
 Db = Annotated[AsyncSession, Depends(get_db)]
 
-NZ_ACCOUNT = re.compile(r"^(\d{2})-?(\d{4})-?(\d{7,8})-?(\d{2,3})$")
+# Same shape Akahu accepts: 2-4-7-2/3 digits.
+NZ_ACCOUNT = re.compile(r"^(\d{2})-?(\d{4})-?(\d{7})-?(\d{2,3})$")
 
 
 class Strict(BaseModel):

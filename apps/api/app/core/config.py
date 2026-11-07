@@ -69,6 +69,7 @@ class Settings(BaseSettings):
     # Payments. Mock by default; Akahu needs explicit configuration.
     payments_provider: Literal["mock", "akahu"] = "mock"
     live_payments_enabled: bool = False
+    akahu_api_url: str = "https://api.payments.akahu.io"
     akahu_app_token: SecretStr | None = None
     akahu_app_secret: SecretStr | None = None
 

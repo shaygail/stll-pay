@@ -238,3 +238,19 @@ payments. The page notes that Demo Bank "does not fully mimic" live connections.
 10. **Refunds:** is there a supported refund pattern, or does the merchant refund
     manually to the account released with `release_account_details`?
 11. **Sandbox restrictions:** what exactly do they limit before accreditation?
+
+## 7. Implementation status (Phase 5)
+
+| Item | Status |
+|---|---|
+| `AkahuPaymentProvider` (`app/payments/providers/akahu.py`) | Built: create, get, cancel, connections, webhook verification with cached signing keys |
+| Amounts | Integer cents inside STLL PAY. Converted to dollars only at the Akahu boundary, through `Decimal` (`akahu_wire.py`) |
+| Error handling | 5xx, 429, timeouts and network errors: temporary (customer can retry). 400: permanent, with Akahu's issue code. 401/403: permanent `provider_auth`, logged |
+| Statement fields | Payee `particulars` = `STLL PAY`, payee and payer `reference` = our 10-character `SP…` reference |
+| Tests against a documented fake | 27 tests (`tests/test_akahu_provider.py`, `tests/fake_akahu.py`) covering the HTTP contract, error mapping, signature checks, and the full engine with webhooks, polling, cancel on expiry, outage and amount mismatch |
+| Demo Bank runner | `scripts/demo_bank_run.py`: automatic checks plus interactive magic-amount scenarios. Writes a report to `docs/reports/` |
+| Demo Bank results | **Not run yet.** Needs sandbox credentials and network access to `api.payments.akahu.io` |
+| Webhooks from real Akahu | Need a public HTTPS URL (staging). Not testable from a local machine; polling covers it meanwhile |
+
+The fake is built from the documentation, so passing against it proves the code matches
+the docs, not that the docs match the real API. Only Demo Bank runs show that.
