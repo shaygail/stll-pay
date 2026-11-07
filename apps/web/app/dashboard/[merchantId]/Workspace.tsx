@@ -3,14 +3,17 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { LinksPanel } from "@/components/LinksPanel";
 import { PaymentsPanel } from "@/components/PaymentsPanel";
+import { QrCodesPanel } from "@/components/QrCodesPanel";
 import { StepUp } from "@/components/StepUp";
 import { TestModeBanner } from "@/components/TestModeBanner";
 import { Button, Notice, StatusChip, Wordmark } from "@/components/ui";
 import { api, ApiError, type Merchant } from "@/lib/api";
+import { usePublicConfig } from "@/lib/useConfig";
 import { useLogout } from "@/lib/useMe";
 
-type Member = { id: string; email: string; role: string };
+type Member = { id: string; email: string; role: string; invite_pending?: boolean };
 
 async function loadWorkspace(merchantId: string) {
   const merchant = await api<Merchant>(`/v1/merchants/${merchantId}`);
@@ -38,6 +41,7 @@ export function MerchantWorkspace() {
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState<(() => Promise<void>) | null>(null);
   const logout = useLogout();
+  const config = usePublicConfig();
 
   const router = useRouter();
   const [version, setVersion] = useState(0);
@@ -81,11 +85,13 @@ export function MerchantWorkspace() {
     const form = new FormData(e.currentTarget);
     const el = e.currentTarget;
     attempt(async () => {
-      await api(`/v1/merchants/${merchantId}/members`, {
+      const added = await api<Member>(`/v1/merchants/${merchantId}/members`, {
         body: { email: form.get("email"), role: form.get("role") },
       });
       el.reset();
-      setNotice("Team member added.");
+      setNotice(
+        added.invite_pending ? "Invitation sent. They'll get an email to set their password." : "Team member added.",
+      );
       reload();
     });
   }
@@ -98,7 +104,9 @@ export function MerchantWorkspace() {
       <header className="flex h-14 items-center justify-between border-b border-line px-5">
         <div className="flex items-center gap-4">
           <Wordmark href="/dashboard" />
-          <Link href="/dashboard" className="text-[14px] text-ink-2">All businesses</Link>
+          {config?.multi_merchant_enabled && (
+            <Link href="/dashboard" className="text-[14px] text-ink-2">All businesses</Link>
+          )}
         </div>
         <Button variant="text" onClick={logout}>Log out</Button>
       </header>
@@ -161,6 +169,16 @@ export function MerchantWorkspace() {
               </section>
             )}
 
+            {(merchant.status === "restricted" || merchant.status === "active") && (
+              <>
+                <QrCodesPanel merchantId={merchant.id} canManage={isOwner || merchant.role === "manager"} />
+                <LinksPanel
+                  merchantId={merchant.id}
+                  canCreate={merchant.role === "owner" || merchant.role === "manager" || merchant.role === "cashier"}
+                />
+              </>
+            )}
+
             {members && (
               <section aria-labelledby="team" className="flex flex-col gap-4">
                 <h2 id="team" className="text-[17px]">Team</h2>
@@ -168,14 +186,17 @@ export function MerchantWorkspace() {
                   {members.map((m) => (
                     <li key={m.id} className="flex min-h-[52px] items-center justify-between gap-3 border-b border-line py-2">
                       <span className="text-[15px]">{m.email}</span>
-                      <span className="text-[13px] capitalize text-ink-2">{m.role}</span>
+                      <span className="text-[13px] capitalize text-ink-2">
+                        {m.role}
+                        {m.invite_pending && " · invite sent"}
+                      </span>
                     </li>
                   ))}
                 </ul>
                 {isOwner && (
                   <form onSubmit={onAddMember} className="flex flex-wrap items-end gap-3" aria-label="Add team member">
                     <div className="flex min-w-[220px] flex-1 flex-col gap-2">
-                      <label htmlFor="member-email" className="eyebrow">Email</label>
+                      <label htmlFor="member-email" className="eyebrow">Team member&apos;s email</label>
                       <input id="member-email" name="email" type="email" required className="h-12 rounded-md border border-line-strong px-3.5" />
                     </div>
                     <div className="flex flex-col gap-2">
@@ -186,7 +207,7 @@ export function MerchantWorkspace() {
                         ))}
                       </select>
                     </div>
-                    <Button type="submit">Add</Button>
+                    <Button type="submit">Invite</Button>
                   </form>
                 )}
               </section>

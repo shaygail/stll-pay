@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { PlatformSettings } from "@/components/PlatformSettings";
 import { StepUp } from "@/components/StepUp";
 import { Button, Notice, StatusChip } from "@/components/ui";
 import { api, ApiError, type Merchant } from "@/lib/api";
@@ -20,6 +21,7 @@ export default function AdminPage() {
   const [items, setItems] = useState<Merchant[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [needsStepUp, setNeedsStepUp] = useState(false);
+  const openStepUp = useCallback(() => setNeedsStepUp(true), []);
 
   const router = useRouter();
   const logout = useLogout();
@@ -71,7 +73,9 @@ export default function AdminPage() {
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-[1100px] flex-col gap-6 px-5 py-8">
-        <h1 className="text-[28px]">Merchants</h1>
+        <h1 className="text-[28px]">Platform admin</h1>
+        <PlatformSettings onStepUp={openStepUp} />
+        <h2 className="text-[17px]">Merchants</h2>
         {error && <Notice tone="error">{error}</Notice>}
         {needsStepUp && (
           <StepUp

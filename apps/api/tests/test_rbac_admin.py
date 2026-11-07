@@ -84,11 +84,14 @@ async def test_owner_can_change_and_remove_member(team):
     assert (await members["cashier"].get(f"/v1/merchants/{merchant['id']}")).status_code == 404
 
 
-async def test_adding_unknown_user_is_refused(team):
+async def test_adding_someone_without_an_account_invites_them(team):
+    from .conftest import latest_email_to, unique_email
     owner, merchant, _ = team
+    email = unique_email("newstaff")
     r = await owner.post(f"/v1/merchants/{merchant['id']}/members",
-                         json={"email": "nobody@example.com", "role": "viewer"})
-    assert r.status_code == 404
+                         json={"email": email, "role": "cashier"})
+    assert r.status_code == 201 and r.json()["invite_pending"] is True
+    assert "/accept-invite?token=" in latest_email_to(email)["body"]
 
 
 async def test_merchant_audit_records_team_changes(team):

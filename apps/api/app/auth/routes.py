@@ -24,6 +24,7 @@ from app.core.config import get_settings
 from app.core.db import get_db, get_sessionmaker, set_context
 from app.core.email import send_email
 from app.core.errors import ApiError
+from app.core.platform import multi_merchant_enabled
 from app.core.ratelimit import limiter
 from app.core.security import (
     decrypt_field,
@@ -125,6 +126,10 @@ def _session_state(auth: AuthContext) -> dict[str, object]:
 async def signup(body: SignupIn, request: Request, db: Db) -> dict[str, str]:
     ip = client_ip(request) or "unknown"
     limiter.check(f"signup:ip:{ip}", 10, 3600)
+    if not await multi_merchant_enabled(db):
+        raise ApiError(403, "signup_closed",
+                       "STLL PAY isn't open for new sign-ups. Ask your administrator for an"
+                       " invitation.")
     email = body.email.lower()
     problems = password_problems(body.password, email)
     if problems:
@@ -150,6 +155,34 @@ async def signup(body: SignupIn, request: Request, db: Db) -> dict[str, str]:
     await audit.record(db, "user.signup", actor_user_id=user.id, target_type="user",
                        target_id=str(user.id), ip=ip)
     return message
+
+
+class AcceptInviteIn(Strict):
+    token: str = Field(min_length=10, max_length=200)
+    password: str = Field(min_length=1, max_length=256)
+
+
+@router.post("/accept-invite", dependencies=[Depends(origin_guard)])
+async def accept_invite(body: AcceptInviteIn, request: Request, db: Db) -> dict[str, str]:
+    """An invited team member sets their password. MFA setup follows at first login."""
+    limiter.check(f"invite:ip:{client_ip(request)}", 20, 3600)
+    row = (await db.execute(
+        select(UserToken).where(UserToken.token_hash == token_hash(body.token),
+                                UserToken.purpose == "invite").with_for_update()
+    )).scalar_one_or_none()
+    if row is None or row.used_at is not None or row.expires_at <= now_utc():
+        raise ApiError(400, "invalid_token", "This invitation is invalid or has expired.")
+    user = (await db.execute(select(User).where(User.id == row.user_id))).scalar_one()
+    problems = password_problems(body.password, user.email)
+    if problems:
+        raise ApiError(422, "weak_password", problems[0], {"problems": problems})
+    row.used_at = now_utc()
+    user.password_hash = hash_password(body.password)
+    user.email_verified_at = user.email_verified_at or now_utc()
+    await audit.record(db, "user.invite_accepted", actor_user_id=user.id, target_type="user",
+                       target_id=str(user.id), ip=client_ip(request))
+    return {"message": "Password set. Log in to finish setting up two-step verification.",
+            "email": user.email}
 
 
 @router.post("/verify-email", dependencies=[Depends(origin_guard)])

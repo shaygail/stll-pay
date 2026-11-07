@@ -90,4 +90,5 @@ export type PublicConfig = {
   environment: string;
   payments_provider: string;
   live_payments_enabled: boolean;
+  multi_merchant_enabled: boolean;
 };

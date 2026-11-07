@@ -1,4 +1,5 @@
 import { ButtonLink, Wordmark } from "@/components/ui";
+import { HomeActions } from "./HomeActions";
 
 export default function Home() {
   return (
@@ -32,12 +33,7 @@ export default function Home() {
             </li>
           ))}
         </ol>
-        <div className="flex flex-wrap gap-3">
-          <ButtonLink href="/signup">Create a business account</ButtonLink>
-          <ButtonLink href="/login" variant="secondary">
-            Log in
-          </ButtonLink>
-        </div>
+        <HomeActions />
         <p className="text-[13px] text-ink-2">
           STLL PAY is in development. It isn&apos;t taking real payments yet.
         </p>

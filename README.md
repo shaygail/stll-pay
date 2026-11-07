@@ -2,7 +2,8 @@
 
 QR-based open banking payments for New Zealand businesses, from STLL HAUS.
 
-> **Status: Phase 5 (Akahu integration) in progress. Demo Bank runs are waiting for sandbox credentials.**
+> **Status: single-merchant MVP (STLL HAUS) built on the mock provider. Akahu Demo Bank runs
+> are waiting for sandbox credentials.**
 > Real-money payments are **not** enabled. They stay disabled until Akahu approval, a
 > security review and the full test milestones are complete.
 
@@ -51,11 +52,17 @@ cd apps/api && uv run python -m app.worker
 cd apps/web && cp .env.example .env.local && npm ci && npm run dev
 ```
 
-Open http://localhost:3000. In development, verification emails are printed in the API
-log (`EMAIL_BACKEND=console`).
+Set up STLL HAUS (launch mode, see [docs/MERCHANT_ONBOARDING.md](docs/MERCHANT_ONBOARDING.md)):
 
-To make a platform admin, run this as the schema owner. It's deliberately not possible
-through the app.
+```bash
+cd apps/api && uv run python scripts/bootstrap_stll_haus.py --admin-email you@example.com --account-number 01-0123-0123456-00 --account-name "STLL HAUS" --verified-by-evidence "local development"
+```
+
+Open the invitation link it prints, set a password, then log in at http://localhost:3000.
+In development, emails are printed in the API log (`EMAIL_BACKEND=console`).
+
+The bootstrap administrator is also the platform admin. To make another platform admin,
+run this as the schema owner. It's deliberately not possible through the app.
 
 ```bash
 psql postgresql://stllpay_owner:devowner@localhost:5432/stllpay_dev -c "UPDATE users SET is_platform_admin = true WHERE email = 'you@example.com'"
@@ -85,6 +92,7 @@ cd apps/web && npm test && npm run e2e -- --trace off
 | [TESTING.md](docs/TESTING.md) | How to run each suite and what it proves |
 | [PAYMENT_LIFECYCLE.md](docs/PAYMENT_LIFECYCLE.md) | Requests, attempts, statuses, failure handling, worker |
 | [POS_INTEGRATION.md](docs/POS_INTEGRATION.md) | POS API, idempotency, signed webhooks, success policy |
+| [MERCHANT_ONBOARDING.md](docs/MERCHANT_ONBOARDING.md) | Launch mode (STLL HAUS only), bootstrap, staff invites, opening to more merchants |
 
 ## Delivery phases
 
@@ -92,8 +100,8 @@ cd apps/web && npm test && npm run e2e -- --trace off
 2. UX/UI design ✓
 3. Application foundation ✓
 4. Payment engine (mock provider) ✓
-5. Akahu integration (Demo Bank only) ← **current**
-6. Merchant platform: single-merchant MVP for STLL HAUS (see PHASE1_REPORT §8a)
+5. Akahu integration (Demo Bank only): built; Demo Bank runs pending credentials
+6. Merchant platform: single-merchant MVP for STLL HAUS ← **current** (see PHASE1_REPORT §8a)
 7. STLL POS integration
 8. Security and live readiness
 

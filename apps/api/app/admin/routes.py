@@ -199,3 +199,40 @@ async def resolve_attempt(attempt_id: uuid.UUID, body: Resolution, request: Requ
                        target_id=str(a.id), ip=client_ip(request),
                        metadata={"outcome": body.outcome, "evidence": body.evidence})
     return {"id": str(a.id), "status": a.status}
+
+
+# ---------------------------------------------------------------- platform settings
+
+
+class PlatformSettingsIn(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    multi_merchant_enabled: bool
+    reason: str = Field(min_length=3, max_length=500)
+
+
+@router.get("/platform-settings")
+async def get_platform_settings(db: Db, _: AuthContext = Depends(platform_admin)
+                                ) -> dict[str, Any]:
+    row = (await db.execute(text("SELECT multi_merchant_enabled, updated_at, updated_by"
+                                 " FROM platform_settings"))).mappings().one()
+    return dict(row)
+
+
+@router.patch("/platform-settings")
+async def update_platform_settings(body: PlatformSettingsIn, request: Request, db: Db,
+                                   auth: AuthContext = Depends(platform_admin)
+                                   ) -> dict[str, Any]:
+    """The feature flag that opens STLL PAY to other merchants (sign-up, onboarding,
+    creating businesses). Off at launch: STLL HAUS only."""
+    before = (await db.execute(text("SELECT multi_merchant_enabled FROM platform_settings"))
+              ).scalar()
+    row = (await db.execute(text(
+        "UPDATE platform_settings SET multi_merchant_enabled = :v, updated_by = :u"
+        " RETURNING multi_merchant_enabled, updated_at, updated_by"),
+        {"v": body.multi_merchant_enabled, "u": auth.user.id})).mappings().one()
+    await audit.record(db, "admin.platform_settings", actor_user_id=auth.user.id,
+                       target_type="platform_settings", ip=client_ip(request),
+                       metadata={"multi_merchant_enabled": {"from": before,
+                                                            "to": body.multi_merchant_enabled},
+                                 "reason": body.reason})
+    return dict(row)

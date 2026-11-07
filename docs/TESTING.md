@@ -128,3 +128,16 @@ Also covered:
 - The Akahu status mapping, and the state machine rules.
 
 Akahu Demo Bank runs of the same scenarios come in Phase 5.
+
+## Launch mode (single merchant)
+
+`tests/test_single_merchant.py` covers launch mode:
+- Sign-up is closed, and so is creating businesses.
+- The platform switch is admin-only (refused through the API and in the database) and audited.
+- Staff join by invitation: invitations are single-use and enforce the password policy, and
+  MFA is set up at first login.
+- The bootstrap script is idempotent, verifies the account only with evidence, and refuses
+  non-ANZ accounts.
+
+The rest of the API suite turns the switch on, because it creates its own users and
+merchants. The browser tests run in launch mode against `scripts/bootstrap_stll_haus.py`.

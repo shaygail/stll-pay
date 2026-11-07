@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { AuthShell, Button, Field, Notice } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
+import { usePublicConfig } from "@/lib/useConfig";
 
 export default function SignupPage() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const config = usePublicConfig();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,6 +27,18 @@ export default function SignupPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  if (config && !config.multi_merchant_enabled) {
+    return (
+      <AuthShell title="Sign-up isn't open yet" eyebrow="Create account">
+        <p className="text-ink-2">
+          STLL PAY is currently open to STLL HAUS only. If you work at STLL HAUS, ask your administrator to invite
+          you; the email has a link to set your password.
+        </p>
+        <Link href="/login" className="text-ink underline">Log in</Link>
+      </AuthShell>
+    );
   }
 
   if (done) {

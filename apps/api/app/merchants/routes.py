@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import timedelta
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Request
@@ -18,14 +19,22 @@ from app.auth.deps import (
     current_auth,
     merchant_access,
 )
-from app.core import audit
+from app.core import audit, clock
+from app.core.config import get_settings
 from app.core.db import get_db, set_context
+from app.core.email import send_email
 from app.core.errors import ApiError, not_found
 from app.core.ids import uuid7
+from app.core.platform import multi_merchant_enabled
 from app.core.rbac import Perm, Role
-from app.models import AuditLog, Merchant, MerchantMembership, User
+from app.core.security import new_token, token_hash
+from app.models import AuditLog, Merchant, MerchantMembership, User, UserToken
 
 router = APIRouter(prefix="/v1/merchants", tags=["merchants"])
+
+# Not a valid Argon2 hash, so nobody can log in until the invitation is accepted.
+INVITED_PASSWORD_HASH = "!invited"  # noqa: S105 - a marker, not a password
+INVITE_DAYS = 7
 Db = Annotated[AsyncSession, Depends(get_db)]
 
 SLUG_PATTERN = r"^[a-z0-9](?:[a-z0-9-]{1,46}[a-z0-9])$"
@@ -78,6 +87,9 @@ def merchant_out(m: Merchant, role: str | None = None) -> dict[str, Any]:
 @router.post("", status_code=201)
 async def create_merchant(body: MerchantCreate, request: Request, db: Db,
                           auth: AuthContext = Depends(current_auth)) -> dict[str, Any]:
+    if not auth.user.is_platform_admin and not await multi_merchant_enabled(db):
+        raise ApiError(403, "merchant_creation_closed",
+                       "New businesses can't be added yet. Contact STLL PAY.")
     merchant_id = uuid7()
     await set_context(db, merchant_id=merchant_id)
     merchant = Merchant(id=merchant_id, **body.model_dump())
@@ -136,7 +148,8 @@ async def submit_for_review(request: Request, db: Db,
 
 def member_out(mm: MerchantMembership, user: User) -> dict[str, Any]:
     return {"id": str(mm.id), "user_id": str(user.id), "email": user.email,
-            "display_name": user.display_name, "role": mm.role, "created_at": mm.created_at}
+            "display_name": user.display_name, "role": mm.role, "created_at": mm.created_at,
+            "invite_pending": user.email_verified_at is None}
 
 
 @router.get("/{merchant_id}/members")
@@ -154,11 +167,22 @@ async def list_members(db: Db, access: MerchantAccess = Depends(merchant_access(
 async def add_member(body: MemberAdd, request: Request, db: Db,
                      access: MerchantAccess = Depends(
                          merchant_access(Perm.TEAM_MANAGE, step_up=True))) -> dict[str, Any]:
-    user = (await db.execute(select(User).where(User.email == body.email.lower()))
-            ).scalar_one_or_none()
-    if user is None or user.email_verified_at is None or user.deleted_at is not None:
-        raise ApiError(404, "user_not_found",
-                       "Ask them to create a STLL PAY account first, then add them.")
+    email = body.email.lower()
+    user = (await db.execute(select(User).where(User.email == email))).scalar_one_or_none()
+    invite = False
+    if user is None:
+        # New person: create an account they finish through an emailed invitation.
+        user = User(email=email, password_hash=INVITED_PASSWORD_HASH)
+        db.add(user)
+        await db.flush()
+        invite = True
+    elif user.deleted_at is not None:
+        raise ApiError(409, "user_unavailable", "That account can't be added.")
+    elif user.email_verified_at is None:
+        if user.password_hash != INVITED_PASSWORD_HASH:
+            raise ApiError(409, "user_unverified",
+                           "That person hasn't verified their email yet.")
+        invite = True  # an earlier invitation wasn't accepted: send a fresh one
     mm = MerchantMembership(merchant_id=access.merchant.id, user_id=user.id, role=body.role)
     db.add(mm)
     try:
@@ -166,11 +190,23 @@ async def add_member(body: MemberAdd, request: Request, db: Db,
     except IntegrityError as exc:
         raise ApiError(409, "already_member", "They're already on this team.") from exc
     await db.refresh(mm)
+    if invite:
+        await _send_invite(db, user, access.merchant.trading_name)
     await audit.record(db, "team.member_added", actor_user_id=access.auth.user.id,
                        merchant_id=access.merchant.id, target_type="user",
                        target_id=str(user.id), ip=client_ip(request),
-                       metadata={"role": body.role})
+                       metadata={"role": body.role, "invited": invite})
     return member_out(mm, user)
+
+
+async def _send_invite(db: AsyncSession, user: User, business: str) -> None:
+    token = new_token()
+    db.add(UserToken(user_id=user.id, purpose="invite", token_hash=token_hash(token),
+                     expires_at=clock.now() + timedelta(days=INVITE_DAYS)))
+    await db.flush()
+    link = f"{get_settings().web_origin}/accept-invite?token={token}"
+    send_email(user.email, f"You've been invited to {business} on STLL PAY",
+               f"Set your password here (valid for {INVITE_DAYS} days): {link}")
 
 
 async def _load_member(db: AsyncSession, merchant_id: uuid.UUID,

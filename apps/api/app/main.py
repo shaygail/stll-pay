@@ -18,6 +18,7 @@ from app.core.config import get_settings
 from app.core.db import dispose_engine, get_sessionmaker
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
+from app.core.platform import multi_merchant_enabled
 from app.merchants.routes import router as merchants_router
 from app.payments.routes_checkout import mock_bank as mock_bank_router
 from app.payments.routes_checkout import router as checkout_router
@@ -95,11 +96,14 @@ def create_app() -> FastAPI:
 
     @app.get("/v1/config", tags=["ops"])
     async def public_config() -> dict[str, object]:
-        # Non-secret flags the web app uses to show the test-mode banner.
+        # Non-secret flags the web app uses (test-mode banner, single-merchant screens).
+        async with get_sessionmaker()() as s:
+            multi = await multi_merchant_enabled(s)
         return {
             "environment": settings.environment,
             "payments_provider": settings.payments_provider,
             "live_payments_enabled": settings.live_payments_enabled,
+            "multi_merchant_enabled": multi,
         }
 
     app.include_router(auth_router)

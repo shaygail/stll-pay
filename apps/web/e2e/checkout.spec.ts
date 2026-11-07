@@ -77,7 +77,8 @@ test("merchant takes a payment from the dashboard and sees it paid", async ({ pa
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByLabel("6-digit code").fill(totp(shop.totp_secret));
   await page.getByRole("button", { name: "Log in" }).click();
-  await page.getByRole("link", { name: /E2E Shop/ }).click();
+  // Launch mode: the only business opens directly.
+  await expect(page.getByRole("heading", { name: "E2E Shop", level: 1 })).toBeVisible();
 
   await expect(page.getByText("E2E Shop ··2300")).toBeVisible();
   await page.getByLabel("Amount (NZD)").fill("8.50");

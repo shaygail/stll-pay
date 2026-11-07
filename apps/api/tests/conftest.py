@@ -64,8 +64,18 @@ def owner_engine() -> Iterator[Engine]:
     command.upgrade(cfg, "head")
     command.downgrade(cfg, "base")
     command.upgrade(cfg, "head")
+    # Most tests create their own users and merchants, so they run with the
+    # multi-merchant flag on. tests/test_single_merchant.py covers launch mode (off).
+    set_multi_merchant(engine, True)
     yield engine
     engine.dispose()
+
+
+def set_multi_merchant(engine: Engine, enabled: bool) -> None:
+    with engine.begin() as conn:
+        conn.execute(text("SELECT set_config('app.is_platform_admin', 'true', true)"))
+        conn.execute(text("UPDATE platform_settings SET multi_merchant_enabled = :v"),
+                     {"v": enabled})
 
 
 class FakeClock:

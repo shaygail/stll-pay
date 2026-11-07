@@ -11,7 +11,7 @@ async def test_health_and_ready(client):
 async def test_public_config_shows_safe_defaults(client):
     body = (await client.get("/v1/config")).json()
     assert body == {"environment": "test", "payments_provider": "mock",
-                    "live_payments_enabled": False}
+                    "live_payments_enabled": False, "multi_merchant_enabled": True}
 
 
 async def test_security_headers(client):

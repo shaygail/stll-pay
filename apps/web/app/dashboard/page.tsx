@@ -2,16 +2,26 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TestModeBanner } from "@/components/TestModeBanner";
 import { Button, Field, Notice, StatusChip, Wordmark } from "@/components/ui";
 import { api, ApiError, type Merchant } from "@/lib/api";
+import { usePublicConfig } from "@/lib/useConfig";
 import { useLogout, useMe } from "@/lib/useMe";
 
 export default function DashboardHome() {
+  const router = useRouter();
   const { me, error } = useMe();
   const logout = useLogout();
-  const router = useRouter();
+  const config = usePublicConfig();
+  const singleMerchant = config !== null && !config.multi_merchant_enabled;
+
+  // Launch mode: one business, so skip the list and open it directly.
+  useEffect(() => {
+    if (singleMerchant && me && me.memberships.length === 1) {
+      router.replace(`/dashboard/${me.memberships[0].merchant_id}`);
+    }
+  }, [singleMerchant, me, router]);
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -78,8 +88,13 @@ export default function DashboardHome() {
                 ))}
               </ul>
             ) : (
-              <p className="text-ink-2">You&apos;re not part of a business yet. Add yours below.</p>
+              <p className="text-ink-2">
+                {singleMerchant
+                  ? "You're not on the STLL HAUS team yet. Ask your administrator to invite you."
+                  : "You're not part of a business yet. Add yours below."}
+              </p>
             )}
+            {config?.multi_merchant_enabled && (
             <section aria-labelledby="new-business" className="flex flex-col gap-5 rounded-md border border-line p-5">
               <h2 id="new-business" className="text-[17px]">Add a business</h2>
               <form onSubmit={onCreate} className="flex flex-col gap-5" noValidate>
@@ -98,6 +113,7 @@ export default function DashboardHome() {
                 </Button>
               </form>
             </section>
+            )}
           </>
         )}
       </main>
