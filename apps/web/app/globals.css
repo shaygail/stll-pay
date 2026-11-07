@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/*
+ * STLL PAY design tokens, copied from STLL REWARDS (shaygail/stll-haus-app, app/globals.css)
+ * so both apps look like one product. Change them in both apps together.
+ * One STLL PAY difference: small text uses --ink-2, never --muted (contrast; see
+ * docs/DESIGN_SYSTEM.md section 3).
+ */
+:root {
+  --bg: #f5f3ef;
+  --surface: #ecebe6;
+  --surface-2: #e3e1db;
+  --ink: #1b1b19;
+  --ink-2: #55534e;
+  --muted: #8f8c85;
+  --line: rgba(27, 27, 25, 0.1);
+  --line-strong: rgba(27, 27, 25, 0.22);
+  --sage: #7a8b78;
+  --sage-ink: #4f5e4d;
+  --sage-soft: rgba(122, 139, 120, 0.16);
+  --danger: #a3473f;
+  --on-ink: #f5f3ef;
+  --radius: 4px;
+  --radius-sm: 2px;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  --bg: #121211;
+  --surface: #1b1b19;
+  --surface-2: #252522;
+  --ink: #f2f0eb;
+  --ink-2: #b4b1aa;
+  --muted: #7d7a74;
+  --line: rgba(242, 240, 235, 0.1);
+  --line-strong: rgba(242, 240, 235, 0.24);
+  --sage: #8fa18c;
+  --sage-ink: #b5c4b2;
+  --sage-soft: rgba(143, 161, 140, 0.16);
+  --danger: #e08b82;
+  --on-ink: #121211;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-sage: var(--sage);
+  --color-sage-ink: var(--sage-ink);
+  --color-sage-soft: var(--sage-soft);
+  --color-danger: var(--danger);
+  --color-on-ink: var(--on-ink);
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-geist-mono);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-geist), system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+
+  a,
+  button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  a.tap {
+    min-height: 44px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+    min-height: 44px;
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 1.5px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .wordmark {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+  }
+
+  .amount {
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+}

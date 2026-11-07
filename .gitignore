@@ -32,3 +32,6 @@ playwright/.cache/
 .DS_Store
 .idea/
 .vscode/
+
+# Local email outbox (dev and tests)
+.outbox/
