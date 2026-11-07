@@ -1,0 +1,19 @@
+# Reviewed false positives (2026-11-07). Each entry is one exact finding; anything new
+# still fails CI. None of these is a real credential.
+
+# Test password for disposable test users ("Correct-Horse-42-battery").
+083f7a0120d8c4619a8161060192faabd7ed2a7f:apps/api/tests/conftest.py:generic-api-key:44
+083f7a0120d8c4619a8161060192faabd7ed2a7f:apps/web/e2e/helpers.ts:generic-api-key:6
+0ceb0da7b99f05de7c8f69698170a9bacc050f6c:apps/api/scripts/e2e_seed.py:generic-api-key:26
+
+# Deliberately wrong password used to test failed logins ("Wrong-pass-123").
+083f7a0120d8c4619a8161060192faabd7ed2a7f:apps/api/tests/test_auth.py:generic-api-key:92
+083f7a0120d8c4619a8161060192faabd7ed2a7f:apps/api/tests/test_auth.py:generic-api-key:103
+
+# Development-only Fernet key (base64 of "dev-only-dev-only-dev-only-dev-0").
+# Staging and production refuse to start with it (app/core/config.py, tested).
+083f7a0120d8c4619a8161060192faabd7ed2a7f:apps/api/app/core/config.py:generic-api-key:19
+083f7a0120d8c4619a8161060192faabd7ed2a7f:apps/api/tests/test_settings_unit.py:generic-api-key:35
+
+# Placeholder key in a settings test (base64 of "prod-key-prod-key-prod-key-prod1").
+083f7a0120d8c4619a8161060192faabd7ed2a7f:apps/api/tests/test_settings_unit.py:generic-api-key:15
