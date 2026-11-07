@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<title>Merchant overview, desktop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5f3ef}
+a{color:#1b1b19}a:hover{color:#55534e}
+</style>
+</helmet>
+<div style="min-height: 1000px; box-sizing: border-box; background: #f5f3ef; color: #1b1b19; font-family: Geist, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <div role="note" style="background: #1b1b19; color: #f5f3ef; font-size: 13px; padding: 9px 24px;">Test mode: payments use the mock provider and sample data. No real money moves. Live payments are switched on by a platform admin after approval.</div>
+  <div style="display: flex; flex-wrap: wrap; flex-grow: 1;">
+    <nav aria-label="Dashboard" style="flex: 1 1 220px; max-width: 260px; box-sizing: border-box; padding: 24px 16px; border-right: 1px solid rgba(27,27,25,0.1); display: flex; flex-direction: column; gap: 2px;">
+      <div style="padding: 0 10px 18px; display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.32em;">STLL PAY</span>
+        <span style="font-size: 16px; font-weight: 500;">STLL HAUS</span>
+        <span style="font-size: 12px; color: #55534e;">Owner</span>
+      </div>
+      <sc-for list="{{nav}}" as="n" hint-placeholder-count="11">
+        <sc-if value="{{n.active}}" hint-placeholder-val="{{false}}"><a href="#" aria-current="page" style="min-height: 40px; display: flex; align-items: center; padding: 0 10px; border-radius: 4px; background: #e3e1db; text-decoration: none; color: #1b1b19; font-size: 14px; font-weight: 500;">{{n.label}}</a></sc-if>
+        <sc-if value="{{n.idle}}" hint-placeholder-val="{{true}}"><a href="#" style="min-height: 40px; display: flex; align-items: center; padding: 0 10px; border-radius: 4px; text-decoration: none; color: #55534e; font-size: 14px;">{{n.label}}</a></sc-if>
+      </sc-for>
+    </nav>
+
+    <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 28px 32px 40px; display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: flex-end;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #55534e;">Overview</span>
+          <h1 style="margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -0.02em;">Today</h1>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <div role="group" aria-label="Date range" style="display: flex; border: 1px solid rgba(27,27,25,0.22); border-radius: 4px; overflow: hidden;">
+            <button aria-pressed="true" style="height: 40px; padding: 0 14px; border: 0; background: #1b1b19; color: #f5f3ef; font-family: Geist, system-ui, sans-serif; font-size: 13px;">Today</button>
+            <button aria-pressed="false" style="height: 40px; padding: 0 14px; border: 0; background: transparent; color: #1b1b19; font-family: Geist, system-ui, sans-serif; font-size: 13px;">7 days</button>
+            <button aria-pressed="false" style="height: 40px; padding: 0 14px; border: 0; background: transparent; color: #1b1b19; font-family: Geist, system-ui, sans-serif; font-size: 13px;">30 days</button>
+          </div>
+          <a href="#" style="height: 40px; box-sizing: border-box; padding: 0 16px; border-radius: 4px; background: #1b1b19; color: #f5f3ef; text-decoration: none; display: flex; align-items: center; font-size: 14px; font-weight: 500;">New payment request</a>
+        </div>
+      </div>
+
+      <section aria-label="Summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px;">
+        <div style="border: 1px solid rgba(27,27,25,0.1); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-size: 13px; color: #55534e;">Received</span>
+          <span style="font-size: 30px; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums;">$1,284.50</span>
+          <span style="font-size: 12px; color: #55534e;">96 payments · confirmed by bank</span>
+        </div>
+        <div style="border: 1px solid rgba(27,27,25,0.1); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-size: 13px; color: #55534e;">Processing</span>
+          <span style="font-size: 30px; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums;">$24.00</span>
+          <span style="font-size: 12px; color: #55534e;">2 payments · not received yet</span>
+        </div>
+        <div style="border: 1px solid rgba(27,27,25,0.1); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-size: 13px; color: #55534e;">Not paid</span>
+          <span style="font-size: 30px; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums;">5</span>
+          <span style="font-size: 12px; color: #55534e;">3 cancelled · 1 declined · 1 expired</span>
+        </div>
+        <a href="#" style="text-decoration: none; color: #1b1b19; border: 1.5px solid #1b1b19; border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-size: 13px;">Needs review</span>
+          <span style="font-size: 30px; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums;">1</span>
+          <span style="font-size: 12px;">Bank result unclear · check now</span>
+        </a>
+      </section>
+
+      <section aria-labelledby="trend" style="border: 1px solid rgba(27,27,25,0.1); border-radius: 4px; padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <h2 id="trend" style="margin: 0; font-size: 15px; font-weight: 500;">Received per day, last 7 days</h2>
+          <a href="#" style="font-size: 13px;">View as table</a>
+        </div>
+        <div role="img" aria-label="Bar chart of confirmed takings per day. Highest Saturday at $1,640." style="height: 180px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; align-items: end; border-bottom: 1px solid rgba(27,27,25,0.22);">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+            <div title="{{d.tip}}" style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px;">
+              <span style="font-size: 12px; color: #55534e; font-variant-numeric: tabular-nums;">{{d.label}}</span>
+              <div style="width: 56%; max-width: 48px; height: {{d.h}}; background: #7a8b78; border-radius: 4px 4px 0 0;"></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; font-size: 12px; color: #55534e; text-align: center;">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="7"><span>{{d.day}}</span></sc-for>
+        </div>
+      </section>
+
+      <section aria-labelledby="latest" style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between;">
+          <h2 id="latest" style="margin: 0; font-size: 15px; font-weight: 500;">Latest payments</h2>
+          <a href="#" style="font-size: 13px;">All payments</a>
+        </div>
+        <div style="overflow-x: auto; border: 1px solid rgba(27,27,25,0.1); border-radius: 4px;">
+          <table style="width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14px;">
+            <thead>
+              <tr style="text-align: left; color: #55534e; font-size: 12px;">
+                <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(27,27,25,0.1);">Time</th>
+                <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(27,27,25,0.1);">Description</th>
+                <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(27,27,25,0.1);">Source</th>
+                <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(27,27,25,0.1);">Reference</th>
+                <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(27,27,25,0.1); text-align: right;">Amount</th>
+                <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(27,27,25,0.1);">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="p" hint-placeholder-count="6">
+                <tr>
+                  <td style="padding: 11px 14px; border-bottom: 1px solid rgba(27,27,25,0.1); color: #55534e; font-variant-numeric: tabular-nums;">{{p.time}}</td>
+                  <td style="padding: 11px 14px; border-bottom: 1px solid rgba(27,27,25,0.1);">{{p.label}}</td>
+                  <td style="padding: 11px 14px; border-bottom: 1px solid rgba(27,27,25,0.1); color: #55534e;">{{p.source}}</td>
+                  <td style="padding: 11px 14px; border-bottom: 1px solid rgba(27,27,25,0.1); font-family: 'Geist Mono', monospace; font-size: 13px;">{{p.ref}}</td>
+                  <td style="padding: 11px 14px; border-bottom: 1px solid rgba(27,27,25,0.1); text-align: right; font-variant-numeric: tabular-nums;">{{p.amount}}</td>
+                  <td style="padding: 11px 14px; border-bottom: 1px solid rgba(27,27,25,0.1);"><span style="font-size: 12px; border: 1px solid {{p.tone}}; color: {{p.tone}}; border-radius: 2px; padding: 3px 7px; white-space: nowrap;">{{p.status}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var labels = ['Overview','Payments','Payment requests','QR codes','Payment links','Reports','Bank account','Team','Integrations','Settings','Help'];
+    var nav = labels.map(function (l, i) { return { label: l, active: i === 0, idle: i !== 0 }; });
+    var vals = [[ 'Sun', 980 ], [ 'Mon', 620 ], [ 'Tue', 710 ], [ 'Wed', 840 ], [ 'Thu', 905 ], [ 'Fri', 1210 ], [ 'Sat', 1640 ]];
+    var max = 1640;
+    var days = vals.map(function (v) {
+      var txt = '$' + v[1].toLocaleString('en-NZ');
+      return { day: v[0], label: txt, tip: v[0] + ': ' + txt + ' received', h: Math.round(v[1] / max * 140) + 'px' };
+    });
+    var ok = '#4f5e4d', neutral = '#55534e', bad = '#a3473f', ink = '#1b1b19';
+    var rows = [
+      { time: '10:42', label: 'Order #42', source: 'POS', ref: 'SP7K3QX9MD', amount: '$12.50', status: 'Paid', tone: ok },
+      { time: '10:39', label: 'Order #41', source: 'POS', ref: 'SP2M8TC4QA', amount: '$6.00', status: 'Processing', tone: neutral },
+      { time: '10:31', label: 'Counter QR', source: 'Static QR', ref: 'SP9QW1RZ7E', amount: '$9.50', status: 'Paid', tone: ok },
+      { time: '10:28', label: 'Order #40', source: 'POS', ref: 'SP4HN6VB2K', amount: '$14.00', status: 'Needs review', tone: ink },
+      { time: '10:02', label: 'Catering deposit', source: 'Payment link', ref: 'SP8JD3XF5P', amount: '$120.00', status: 'Paid', tone: ok },
+      { time: '09:55', label: 'Order #39', source: 'POS', ref: 'SP6TB9KC1W', amount: '$5.50', status: 'Declined', tone: bad }
+    ];
+    return { nav: nav, days: days, rows: rows };
+  }
+}
+</script>
+</body>
+</html>

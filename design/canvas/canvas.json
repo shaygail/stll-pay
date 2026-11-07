@@ -1,0 +1,34 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-11-07T06:00:00Z"},
+  "title": "STLL PAY Phase 2 Design",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "1 · Pay STLL HAUS (counter QR)"},
+    "Review.dc.html": {"x": 470, "y": 0, "w": 390, "h": 844, "title": "2 · Review order (POS QR)"},
+    "Redirect.dc.html": {"x": 940, "y": 0, "w": 390, "h": 844, "title": "3 · To your bank"},
+    "Processing.dc.html": {"x": 1410, "y": 0, "w": 390, "h": 844, "title": "4 · Processing"},
+    "Paid.dc.html": {"x": 1880, "y": 0, "w": 390, "h": 844, "title": "5 · Paid"},
+    "Failed.dc.html": {"x": 2350, "y": 0, "w": 390, "h": 844, "title": "6 · Failed"},
+    "Cancelled.dc.html": {"x": 2820, "y": 0, "w": 390, "h": 844, "title": "7 · Cancelled"},
+    "Expired.dc.html": {"x": 3290, "y": 0, "w": 390, "h": 844, "title": "8 · Expired"},
+    "Unconfirmed.dc.html": {"x": 3760, "y": 0, "w": 390, "h": 844, "title": "9 · Unconfirmed (needs review)"},
+    "POS.dc.html": {"x": 0, "y": 1224, "w": 1180, "h": 820, "title": "POS · iPad checkout QR"},
+    "DashboardMobile.dc.html": {"x": 1260, "y": 1224, "w": 390, "h": 844, "title": "Merchant · Overview (phone)"},
+    "Dashboard.dc.html": {"x": 1730, "y": 1224, "w": 1440, "h": 1000, "title": "Merchant · Overview (desktop)", "expand": "fill"},
+    "Admin.dc.html": {"x": 0, "y": 2604, "w": 1440, "h": 1000, "title": "Platform admin", "expand": "fill"},
+    "SiteMap.dc.html": {"x": 1520, "y": 2604, "w": 1440, "h": 900, "title": "Information architecture"}
+  },
+  "order": [
+    "Main.dc.html", "Review.dc.html", "Redirect.dc.html", "Processing.dc.html", "Paid.dc.html",
+    "Failed.dc.html", "Cancelled.dc.html", "Expired.dc.html", "Unconfirmed.dc.html",
+    "POS.dc.html", "DashboardMobile.dc.html", "Dashboard.dc.html", "Admin.dc.html", "SiteMap.dc.html"
+  ],
+  "notes": {
+    "t1": {"x": 0, "y": -300, "text": "Customer checkout", "kind": "title1", "maxW": 4150},
+    "t2": {"x": 0, "y": 924, "text": "Merchant and POS", "kind": "title1", "maxW": 3170},
+    "t3": {"x": 0, "y": 2304, "text": "Admin and structure", "kind": "title1", "maxW": 2960}
+  },
+  "designSystems": []
+}

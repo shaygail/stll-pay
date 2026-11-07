@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<title>Payment request expired</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1b1b19}a:hover{color:#55534e}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #f5f3ef; color: #1b1b19; font-family: Geist, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <header style="height: 56px; box-sizing: border-box; padding: 0 20px; display: flex; align-items: center; border-bottom: 1px solid rgba(27,27,25,0.1);">
+    <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.32em;">STLL PAY</span>
+  </header>
+
+  <main style="flex-grow: 1; padding: 44px 20px 0; display: flex; flex-direction: column; gap: 22px;">
+    <span aria-hidden="true" style="width: 56px; height: 56px; border-radius: 4px; background: #ecebe6; color: #55534e; display: flex; align-items: center; justify-content: center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2"></path><path d="M9.5 2.5h5"></path></svg></span>
+    <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #55534e;">Expired</span>
+    <h1 style="margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15;">This payment request has expired</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #55534e;">For your safety, each QR code only works for a short time. Nothing was paid. Ask staff at STLL HAUS for a new code.</p>
+  </main>
+
+  <footer style="padding: 16px 20px 28px; display: flex; flex-direction: column; gap: 8px;">
+    <span style="font-size: 12px; text-align: center; color: #55534e;">Request SP7K3QX9MD · expired 10:51 am</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

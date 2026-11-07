@@ -2,7 +2,7 @@
 
 QR-based open banking payments for New Zealand businesses, from STLL HAUS.
 
-> **Status: Phase 1 (research and audit) done, awaiting approval. No application code yet.**
+> **Status: Phase 1 approved. Phase 2 (design) done, awaiting approval. No application code yet.**
 > See [docs/PHASE1_REPORT.md](docs/PHASE1_REPORT.md) and [docs/AKAHU_INTEGRATION.md](docs/AKAHU_INTEGRATION.md).
 > Real-money payments are **not** enabled and will stay disabled until provider approval,
 > a security review and the full test milestones are done.
@@ -31,8 +31,8 @@ see a verified payment status. The merchant gets payment updates automatically.
 
 ## Delivery phases
 
-1. Research and audit ← **current**
-2. UX/UI design
+1. Research and audit ✓
+2. UX/UI design ← **current**
 3. Application foundation
 4. Payment engine (mock provider)
 5. Akahu integration (Demo Bank only)

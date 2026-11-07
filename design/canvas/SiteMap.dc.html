@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<title>STLL PAY information architecture</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; background: #f5f3ef; color: #1b1b19; font-family: Geist, system-ui, sans-serif; padding: 48px; display: flex; flex-direction: column; gap: 28px;">
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.32em;">STLL PAY</span>
+    <h1 style="margin: 0; font-size: 32px; font-weight: 500; letter-spacing: -0.02em;">Information architecture</h1>
+    <p style="margin: 0; font-size: 15px; color: #55534e;">pay.stllhaus.co · five areas, each with its own access rule</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; flex-grow: 1;">
+    <sc-for list="{{areas}}" as="a" hint-placeholder-count="5">
+      <section style="border: 1px solid rgba(27,27,25,0.1); border-radius: 4px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px; border-bottom: 1px solid rgba(27,27,25,0.1);">
+          <h2 style="margin: 0; font-size: 17px; font-weight: 500;">{{a.title}}</h2>
+          <span style="font-size: 12px; color: #55534e;">{{a.access}}</span>
+        </div>
+        <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 9px;">
+          <sc-for list="{{a.routes}}" as="r" hint-placeholder-count="8">
+            <li style="display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 14px;">{{r.name}}</span><span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #55534e;">{{r.path}}</span></li>
+          </sc-for>
+        </ul>
+      </section>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    function R(list) { return list.map(function (x) { return { name: x[0], path: x[1] }; }); }
+    return { areas: [
+      { title: 'Public site', access: 'Anyone', routes: R([
+        ['Home', '/'], ['How QR payments work', '/how-it-works'], ['Security', '/security'], ['Pricing (placeholder)', '/pricing'],
+        ['For businesses', '/business'], ['Sign up', '/signup'], ['Log in', '/login'], ['Support', '/support'], ['Privacy · Terms', '/legal/*'] ]) },
+      { title: 'Checkout', access: 'Anyone with the link · no login', routes: R([
+        ['Counter QR (enter amount)', '/pay/{merchant}'], ['Payment request (POS QR)', '/c/{requestId}'], ['Payment link', '/l/{linkId}'],
+        ['Review', '…/review'], ['To bank (Akahu)', '…/authorise'], ['Return and status', '…/status'], ['Manual transfer details', '…/transfer'] ]) },
+      { title: 'Merchant dashboard', access: 'Merchant team · MFA · role based', routes: R([
+        ['Overview', '/dashboard'], ['Payments', '/dashboard/payments'], ['Payment requests', '/dashboard/requests'], ['QR codes', '/dashboard/qr'],
+        ['Payment links', '/dashboard/links'], ['Reports', '/dashboard/reports'], ['Bank account (step-up)', '/dashboard/bank'], ['Team', '/dashboard/team'],
+        ['Integrations · API keys · webhooks', '/dashboard/integrations'], ['Settings · Help', '/dashboard/settings'] ]) },
+      { title: 'Onboarding', access: 'New merchant owner · MFA', routes: R([
+        ['Create account', '/signup'], ['Verify email', '/signup/verify'], ['Set up MFA', '/signup/mfa'], ['Business details', '/onboarding/business'],
+        ['Verification documents', '/onboarding/verify'], ['Receiving bank account', '/onboarding/bank'], ['Agreements', '/onboarding/terms'], ['Awaiting approval', '/onboarding/status'] ]) },
+      { title: 'Platform admin', access: 'Platform admins only · MFA · separate session', routes: R([
+        ['Health', '/admin'], ['Merchant approvals', '/admin/approvals'], ['Merchants', '/admin/merchants'], ['Needs review', '/admin/review'],
+        ['Failed payments', '/admin/failed'], ['Webhook issues', '/admin/webhooks'], ['Security events', '/admin/security'], ['Audit log', '/admin/audit'], ['Configuration', '/admin/config'] ]) }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

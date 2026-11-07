@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<title>Platform admin</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#121211}
+a{color:#f2f0eb}a:hover{color:#b4b1aa}
+</style>
+</helmet>
+<div style="min-height: 1000px; box-sizing: border-box; background: #121211; color: #f2f0eb; font-family: Geist, system-ui, sans-serif; display: flex; flex-wrap: wrap;">
+  <nav aria-label="Admin" style="flex: 1 1 220px; max-width: 260px; box-sizing: border-box; padding: 24px 16px; border-right: 1px solid rgba(242,240,235,0.1); display: flex; flex-direction: column; gap: 2px;">
+    <div style="padding: 0 10px 18px; display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.32em;">STLL PAY</span>
+      <span style="font-size: 16px; font-weight: 500;">Platform admin</span>
+      <span style="align-self: flex-start; font-size: 11px; color: #b5c4b2; border: 1px solid #b5c4b2; border-radius: 2px; padding: 2px 6px;">MFA verified · 1h 52m left</span>
+    </div>
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="8">
+      <sc-if value="{{n.active}}" hint-placeholder-val="{{false}}"><a href="#" aria-current="page" style="min-height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; border-radius: 4px; background: #252522; text-decoration: none; color: #f2f0eb; font-size: 14px; font-weight: 500;"><span>{{n.label}}</span><span style="font-size: 12px;">{{n.count}}</span></a></sc-if>
+      <sc-if value="{{n.idle}}" hint-placeholder-val="{{true}}"><a href="#" style="min-height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; border-radius: 4px; text-decoration: none; color: #b4b1aa; font-size: 14px;"><span>{{n.label}}</span><span style="font-size: 12px;">{{n.count}}</span></a></sc-if>
+    </sc-for>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 28px 32px 40px; display: flex; flex-direction: column; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #b4b1aa;">Environment · staging</span>
+      <h1 style="margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -0.02em;">Platform health</h1>
+    </div>
+
+    <section aria-label="Provider health" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+      <div style="border: 1px solid rgba(242,240,235,0.1); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 13px; color: #b4b1aa;">Mock provider</span>
+        <span style="font-size: 18px; font-weight: 500; color: #b5c4b2;">Active</span>
+        <span style="font-size: 12px; color: #b4b1aa;">Default for dev and staging</span>
+      </div>
+      <div style="border: 1px solid rgba(242,240,235,0.1); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 13px; color: #b4b1aa;">Akahu</span>
+        <span style="font-size: 18px; font-weight: 500;">Not configured</span>
+        <span style="font-size: 12px; color: #b4b1aa;">Needs Full App sandbox credentials</span>
+      </div>
+      <div style="border: 1px solid rgba(242,240,235,0.1); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 13px; color: #b4b1aa;">Live payments</span>
+        <span style="font-size: 18px; font-weight: 500;">Off</span>
+        <span style="font-size: 12px; color: #b4b1aa;">Global switch · requires approval</span>
+      </div>
+      <div style="border: 1px solid rgba(242,240,235,0.1); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 13px; color: #b4b1aa;">Worker</span>
+        <span style="font-size: 18px; font-weight: 500;">Running · 0 queued</span>
+        <span style="font-size: 12px; color: #b4b1aa;">Last poll 14 s ago</span>
+      </div>
+    </section>
+
+    <section aria-labelledby="approvals" style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 id="approvals" style="margin: 0; font-size: 15px; font-weight: 500;">Merchant approvals</h2>
+      <div style="overflow-x: auto; border: 1px solid rgba(242,240,235,0.1); border-radius: 4px;">
+        <table style="width: 100%; min-width: 680px; border-collapse: collapse; font-size: 14px;">
+          <thead>
+            <tr style="text-align: left; color: #b4b1aa; font-size: 12px;">
+              <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);">Business</th>
+              <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);">Submitted</th>
+              <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);">Business check</th>
+              <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);">Bank account</th>
+              <th scope="col" style="font-weight: 500; padding: 10px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);">State</th>
+              <th scope="col" style="padding: 10px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Action</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{merchants}}" as="m" hint-placeholder-count="3">
+              <tr>
+                <td style="padding: 11px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);">{{m.name}}</td>
+                <td style="padding: 11px 14px; border-bottom: 1px solid rgba(242,240,235,0.1); color: #b4b1aa;">{{m.when}}</td>
+                <td style="padding: 11px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);">{{m.kyb}}</td>
+                <td style="padding: 11px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);">{{m.bank}}</td>
+                <td style="padding: 11px 14px; border-bottom: 1px solid rgba(242,240,235,0.1);"><span style="font-size: 12px; border: 1px solid rgba(242,240,235,0.24); border-radius: 2px; padding: 3px 7px; white-space: nowrap;">{{m.state}}</span></td>
+                <td style="padding: 6px 14px; border-bottom: 1px solid rgba(242,240,235,0.1); text-align: right;"><a href="#" style="display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border: 1px solid rgba(242,240,235,0.24); border-radius: 4px; text-decoration: none; font-size: 13px;">Review</a></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+      <section aria-labelledby="review" style="border: 1px solid rgba(242,240,235,0.1); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <h2 id="review" style="margin: 0; font-size: 15px; font-weight: 500;">Payments needing review · 1</h2>
+        <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 10px 0; border-top: 1px solid rgba(242,240,235,0.1);">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span>STLL HAUS · Order #40 · $14.00</span><span style="font-size: 12px; color: #b4b1aa;">Bank result unclear · 10:28 · SP4HN6VB2K</span></div>
+          <a href="#" style="font-size: 13px; white-space: nowrap;">Open</a>
+        </div>
+      </section>
+      <section aria-labelledby="security" style="border: 1px solid rgba(242,240,235,0.1); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <h2 id="security" style="margin: 0; font-size: 15px; font-weight: 500;">Security events · last 24 h</h2>
+        <sc-for list="{{events}}" as="e" hint-placeholder-count="3">
+          <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 8px 0; border-top: 1px solid rgba(242,240,235,0.1);"><span>{{e.what}}</span><span style="font-size: 12px; color: #b4b1aa; white-space: nowrap;">{{e.when}}</span></div>
+        </sc-for>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var items = [['Health', ''], ['Merchant approvals', '3'], ['Merchants', ''], ['Needs review', '1'], ['Failed payments', '4'], ['Webhook issues', '0'], ['Security events', '3'], ['Audit log', ''], ['Configuration', '']];
+    var nav = items.map(function (it, i) { return { label: it[0], count: it[1], active: i === 0, idle: i !== 0 }; });
+    return {
+      nav: nav,
+      merchants: [
+        { name: 'Sample café A', when: '6 Nov, 3:12 pm', kyb: 'NZBN matched', bank: 'Awaiting proof', state: 'Restricted' },
+        { name: 'Sample market stall B', when: '5 Nov, 9:40 am', kyb: 'Documents uploaded', bank: 'Proof received', state: 'Pending review' },
+        { name: 'Sample studio C', when: '2 Nov, 11:05 am', kyb: 'NZBN matched', bank: 'Verified', state: 'Pending review' }
+      ],
+      events: [
+        { what: 'Bank account change requested · STLL HAUS (24 h hold)', when: '09:14' },
+        { what: '5 failed sign-ins · one account, locked 15 min', when: '07:52' },
+        { what: 'API key rotated · STLL HAUS POS', when: 'Yesterday' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

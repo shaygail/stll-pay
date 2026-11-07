@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<title>Taking you to your bank</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1b1b19}a:hover{color:#55534e}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #f5f3ef; color: #1b1b19; font-family: Geist, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <header style="height: 56px; box-sizing: border-box; padding: 0 20px; display: flex; align-items: center; border-bottom: 1px solid rgba(27,27,25,0.1);">
+    <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.32em;">STLL PAY</span>
+  </header>
+
+  <main style="flex-grow: 1; padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 18px;">
+    <div aria-hidden="true" style="display: flex; gap: 6px;">
+      <span style="width: 28px; height: 3px; background: #1b1b19; border-radius: 2px;"></span>
+      <span style="width: 28px; height: 3px; background: #1b1b19; border-radius: 2px;"></span>
+      <span style="width: 28px; height: 3px; background: rgba(27,27,25,0.22); border-radius: 2px;"></span>
+    </div>
+    <h1 style="margin: 0; font-size: 26px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.2;">Taking you to Akahu to choose your bank</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #55534e;">You'll approve $12.50 to STLL HAUS in your bank. Then you'll come back here automatically.</p>
+    <p role="status" style="margin: 0; font-size: 13px; color: #55534e;">Opening secure page…</p>
+  </main>
+
+  <footer style="padding: 16px 20px 28px; display: flex; flex-direction: column; gap: 8px;">
+    <a href="#" style="height: 52px; box-sizing: border-box; border: 1px solid #1b1b19; border-radius: 4px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #1b1b19; font-size: 16px; font-weight: 500;">Continue to Akahu</a>
+    <span style="font-size: 12px; text-align: center; color: #55534e;">Use this if nothing happens in a few seconds.</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

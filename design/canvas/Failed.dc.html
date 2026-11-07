@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<title>Payment didn't go through</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1b1b19}a:hover{color:#55534e}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #f5f3ef; color: #1b1b19; font-family: Geist, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <header style="height: 56px; box-sizing: border-box; padding: 0 20px; display: flex; align-items: center; border-bottom: 1px solid rgba(27,27,25,0.1);">
+    <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.32em;">STLL PAY</span>
+  </header>
+
+  <main style="flex-grow: 1; padding: 44px 20px 0; display: flex; flex-direction: column; gap: 22px;">
+    <span aria-hidden="true" style="width: 56px; height: 56px; border-radius: 4px; background: rgba(163,71,63,0.1); color: #a3473f; display: flex; align-items: center; justify-content: center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10"></path><path d="M17 7 7 17"></path></svg></span>
+    <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #a3473f;">Not paid</span>
+    <h1 style="margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15;">Your payment didn't go through</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #55534e;">Your bank declined the $12.50 payment to STLL HAUS, so no money was sent. Banks don't share the reason. A common one is the daily limit or not enough funds.</p>
+    <div style="display: flex; justify-content: space-between; font-size: 13px; color: #55534e; border-top: 1px solid rgba(27,27,25,0.1); padding-top: 12px;"><span>Reference</span><span style="font-family: 'Geist Mono', monospace; color: #1b1b19;">SP7K3QX9MD</span></div>
+  </main>
+
+  <footer style="padding: 16px 20px 28px; display: flex; flex-direction: column; gap: 8px;">
+    <button style="height: 52px; border: 0; border-radius: 4px; background: #1b1b19; color: #f5f3ef; font-family: Geist, system-ui, sans-serif; font-size: 16px; font-weight: 500; cursor: pointer;">Try again</button>
+    <button style="height: 52px; border: 1px solid rgba(27,27,25,0.22); border-radius: 4px; background: transparent; color: #1b1b19; font-family: Geist, system-ui, sans-serif; font-size: 15px; cursor: pointer;">Try a different bank</button>
+    <span style="font-size: 12px; text-align: center; color: #55534e; padding-top: 4px;">Or ask staff to pay another way.</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

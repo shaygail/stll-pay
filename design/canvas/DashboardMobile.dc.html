@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<title>Merchant overview, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1b1b19}a:hover{color:#55534e}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #f5f3ef; color: #1b1b19; font-family: Geist, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <div role="note" style="background: #1b1b19; color: #f5f3ef; font-size: 12px; padding: 8px 20px;">Test mode · sample data · no real money moves</div>
+  <header style="height: 56px; box-sizing: border-box; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(27,27,25,0.1);">
+    <span style="font-size: 15px; font-weight: 500; letter-spacing: -0.01em;">STLL HAUS</span>
+    <button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #1b1b19;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg></button>
+  </header>
+
+  <main style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column; gap: 18px; overflow: hidden;">
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #55534e;">Today · received</span>
+      <span style="font-size: 40px; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.1;">$1,284.50</span>
+      <span style="font-size: 13px; color: #55534e;">96 payments confirmed by bank</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+      <div style="background: #ecebe6; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #55534e;">Processing</span><span style="font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums;">2</span></div>
+      <div style="background: #ecebe6; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #55534e;">Not paid</span><span style="font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums;">5</span></div>
+      <a href="#" style="text-decoration: none; color: #1b1b19; border: 1.5px solid #1b1b19; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px;">Needs review</span><span style="font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums;">1</span></a>
+    </div>
+
+    <a href="#" style="height: 52px; box-sizing: border-box; border-radius: 4px; background: #1b1b19; color: #f5f3ef; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; font-weight: 500;">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6"></rect><rect x="14" y="4" width="6" height="6"></rect><rect x="4" y="14" width="6" height="6"></rect><path d="M14 14h2v2h-2z"></path><path d="M18 18h2v2h-2z"></path></svg>
+      New payment request
+    </a>
+
+    <section aria-labelledby="recent" style="display: flex; flex-direction: column;">
+      <h2 id="recent" style="margin: 0 0 6px; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #55534e;">Latest payments</h2>
+      <sc-for list="{{rows}}" as="p" hint-placeholder-count="6">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid rgba(27,27,25,0.1);">
+          <div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 15px;">{{p.label}}</span><span style="font-size: 12px; color: #55534e;">{{p.time}} · {{p.source}}</span></div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px;"><span style="font-size: 15px; font-variant-numeric: tabular-nums;">{{p.amount}}</span><span style="font-size: 12px; color: {{p.tone}};">{{p.status}}</span></div>
+        </div>
+      </sc-for>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var ok = '#4f5e4d', neutral = '#55534e', bad = '#a3473f', ink = '#1b1b19';
+    return { rows: [
+      { label: 'Order #42', time: '10:42', source: 'POS', amount: '$12.50', status: 'Paid', tone: ok },
+      { label: 'Order #41', time: '10:39', source: 'POS', amount: '$6.00', status: 'Processing', tone: neutral },
+      { label: 'Counter QR', time: '10:31', source: 'Static QR', amount: '$9.50', status: 'Paid', tone: ok },
+      { label: 'Order #40', time: '10:28', source: 'POS', amount: '$14.00', status: 'Needs review', tone: ink },
+      { label: 'Catering deposit', time: '10:02', source: 'Link', amount: '$120.00', status: 'Paid', tone: ok },
+      { label: 'Order #39', time: '09:55', source: 'POS', amount: '$5.50', status: 'Declined', tone: bad }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

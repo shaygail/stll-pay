@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<title>Pay STLL HAUS</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1b1b19}a:hover{color:#55534e}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #f5f3ef; color: #1b1b19; font-family: Geist, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <header style="height: 56px; box-sizing: border-box; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(27,27,25,0.1);">
+    <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.32em;">STLL PAY</span>
+    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #55534e;">
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+      Secure bank payment
+    </span>
+  </header>
+
+  <main style="flex-grow: 1; padding: 28px 20px 0; display: flex; flex-direction: column; gap: 28px;">
+    <section aria-label="Who you are paying" style="display: flex; gap: 14px; align-items: center;">
+      <div aria-hidden="true" style="width: 56px; height: 56px; border-radius: 4px; background: #1b1b19; color: #f5f3ef; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; letter-spacing: 0.2em;">STLL</div>
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+        <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #55534e;">Paying</span>
+        <h1 style="margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15;">STLL HAUS</h1>
+        <span style="display: flex; align-items: center; gap: 5px; font-size: 13px; color: #4f5e4d;">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m8 12.5 2.6 2.5L16 9.5"></path></svg>
+          Verified business
+        </span>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <label for="amount" style="font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #55534e;">Amount (NZD)</label>
+      <div style="display: flex; align-items: baseline; gap: 4px; border-bottom: 1.5px solid #1b1b19; padding-bottom: 8px;">
+        <span aria-hidden="true" style="font-size: 40px; font-weight: 500; color: #55534e;">$</span>
+        <input id="amount" inputmode="decimal" value="12.50" style="border: 0; background: transparent; font-family: Geist, system-ui, sans-serif; font-size: 48px; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; width: 100%; padding: 0; color: #1b1b19; outline: none;">
+      </div>
+      <span style="font-size: 13px; color: #55534e;">Enter the amount shown at the counter.</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <label for="note" style="font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #55534e;">What's it for? (optional)</label>
+      <input id="note" placeholder="e.g. 2 coffees" style="box-sizing: border-box; height: 48px; border: 1px solid rgba(27,27,25,0.22); border-radius: 4px; padding: 0 14px; background: #f5f3ef; font-family: Geist, system-ui, sans-serif; font-size: 16px; color: #1b1b19;">
+    </div>
+  </main>
+
+  <footer style="padding: 16px 20px 28px; display: flex; flex-direction: column; gap: 14px;">
+    <button style="height: 52px; border: 0; border-radius: 4px; background: #1b1b19; color: #f5f3ef; font-family: Geist, system-ui, sans-serif; font-size: 16px; font-weight: 500; cursor: pointer;">Continue</button>
+    <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #55534e; text-align: center;">You approve the payment in your own bank. STLL PAY never sees your banking login. <a href="#">How it works</a></p>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
